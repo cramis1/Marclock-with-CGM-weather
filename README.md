@@ -1,3 +1,7 @@
+### Interface 
+![ionic](https://imgur.com/Ys9Eu1p "ionic")
+![versa](https://imgur.com/psYb768 "versa")
+
 # Marclock-with-CGM-weather
 Fitbit Clock Face for Versa and Ionic
 
@@ -29,5 +33,4 @@ DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!
 
 This is made and based on the awesome fitbit clockfaces published by PedanticAvenger (FlashCGM) and Rytiggy (Glance). As an amateur coder, these repositories were immensly helpful.
 
-Ionic: <img align="middle" src="https://imgur.com/Ys9Eu1p">
-Versa: <img align="middle" src="https://imgur.com/psYb768">
+
