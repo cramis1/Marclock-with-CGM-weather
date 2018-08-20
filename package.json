@@ -1,0 +1,26 @@
+{
+  "fitbit": {
+    "appUUID": "9eacf714-5b23-40c8-9621-ded74bd9edf9",
+    "appType": "clockface",
+    "appDisplayName": "Marclock CGM & Weather",
+    "iconFile": "resources/icon.png",
+    "wipeColor": "",
+    "requestedPermissions": [
+      "access_activity",
+      "access_heart_rate",
+      "access_internet",
+      "access_location",
+      "run_background",
+      "access_user_profile"
+    ],
+    "buildTargets": [
+      "higgs",
+      "meson"
+    ],
+    "i18n": {
+      "en": {
+        "name": "Marclock CGM & Weather"
+      }
+    }
+  }
+}

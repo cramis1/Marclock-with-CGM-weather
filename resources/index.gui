@@ -1,0 +1,93 @@
+<svg class="SVGobjects">
+  <gradientRect id="gradbackgnd" x="0" y="0" width="100%" height="100%"
+    gradient-type="bilinear"
+    gradient-x1="30" gradient-y1="30"
+    gradient-x2="100%-50" gradient-y2="100%-50"
+    gradient-color1="#1dbbbb"
+    gradient-color2="black"
+    gradient-color3="black"
+    gradient-color4="#1c453b"
+    id="clickbg" pointer-events="visible" />
+  <image id="activeIMG" x="1" y="63" width="15" height="15" href="icons/active.png" /> 
+  <image id="stepsIMG" x="1" y="37" width="15" height="15" href="icons/steps.png" />
+  <image id="weatherIMG" href="icons/sunny.png" /> <!-- x="303" y="32" width="32" height="32" -->  
+  <image id="hrIMG" x="2" y="7" width="21" height="21" href="icons/hr.png" fill-opacity="0.8"/>
+  
+  
+  <g transform="translate(50%, 50%)">
+  <arc id="leftArc" y="-113" x="-113" width="226" height="226" 
+       arc-width="10" start-angle="-90" sweep-angle="180" 
+       fill="greenyellow" pointer-events="visible" /> // x348 y250
+  <!-- <arc id="rightArc" y="-113" x="-113" width="226" height="226" 
+       arc-width="10" start-angle="0" sweep-angle="180" 
+       fill="greenyellow" pointer-events="visible" /> -->
+    <animateTransform attributeType="rotate" begin="click" from="0" to="360" dur="0.8" easing="ease-in-out" />
+  </g>
+    
+  <text id="date" />
+  <text id="battery" />
+  <text id="time" />
+
+
+  <text id="active" > --</text>
+
+
+  <text id="steps"  > --</text>
+
+
+  <text id="dist"  > --</text> 
+
+
+  <text id="hr"  > -- bpm</text>
+  
+  <!--Start of BG stuff-->
+  <text id="delta" class="status-text" x="1%" y="71%" text-anchor="start" font-size="18">???</text>
+  <text id="bg" class="h1 status-text" x="1%" y="90%"  text-anchor="start" font-size="60" >??.0</text>
+  <text id="minutes" class="status-text" x="3%" y="97%" text-anchor="start" font-size="14">? mins</text>
+  
+  <line id="strikeLine" x1="2" y1="207" x2="100" y2="207" fill="#708090" stroke-width="8" display="none" /> 
+  
+  
+  <image id="arrow" href="icons/even.png" visibility="visible" /> <!-- x="34%" y="67%" width="65" height="65" href="icons/even.png" visibility="visible" /> -->
+    
+ 
+  
+   <!-- Graph -->
+      <svg class="graphset" >  <!--x="60%-24" y="65%+3" width="135" height="80"> -->
+        <use href="#graph" id="docGraph" x="0" y="0" width="100%" height="100%" />
+    
+        <text id="high" class="status-text" x="99%" y="40%"  text-anchor="start">hi</text>
+       <!-- <text id="middle" class="status-text" x="91%" y="65%+50"  text-anchor="start">mid</text> -->     
+        <text id="low" class="status-text" x="99%" y="88%"  text-anchor="start">low</text>  
+         </svg>
+  
+  <!-- Alert -->
+      <svg id="popup" display="none" >
+        <!-- Black background -->
+        <rect class="full-size" fill="fb-black" />
+
+        <!-- Title and text -->
+        <use href="#mixed-text-center-mid" class="dialog-mixed-text" fill="fb-white" id="alertHeader">
+          <set href="#top-padding" attributeName="display" to="none" />
+          <set href="#header/text" attributeName="text-buffer"  to="---" />
+          <set href="#header/text" attributeName="fill" to="fb-magenta"/>
+          <set href="#copy/text" attributeName="text-buffer" to="Check BG!" />
+          <set href="#bottom-padding" attributeName="display" to="none" />
+        </use>
+
+        <!-- Left button -->
+        <use id="btnLeft" class="dialog-half-button-left" href="#square-button-neutral">
+           <set href="#text" attributeName="text-buffer" to="Mute" /> <!--Change this to be 15 when you add the 15 min mute code in -->
+          <set href="#text" attributeName="text-anchor" to="middle" />
+        </use>
+
+        <!-- Right button -->
+        <use id="btnRight" class="dialog-half-button-right" href="#square-button-negative">
+          <set href="#text" attributeName="text-buffer" to="Snooze" />
+          <set href="#text" attributeName="text-anchor" to="middle" />
+        </use>
+      </svg>
+      
+
+
+</svg>
