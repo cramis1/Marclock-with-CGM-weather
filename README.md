@@ -44,7 +44,7 @@ This is made and based on the awesome fitbit clockfaces published by PedanticAve
 
 # Instructions
 - You must have your blood sugars accessible through a URL. (Examples include [xDrip+](https://github.com/jamorham/xDrip-plus), [Nightscout](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku), [Spike](https://spike-app.com/) )
-- Starting on your phone, navigate to the [Latest version of Marclock](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9) And click the **Select** button. Then click **install**. 
+- Starting on your phone, navigate to the [latest version of Marclock](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9) and click the **Select** button. Then click **install**. 
 - After the installation has finished open the **Fitbit** app and navigate to **clock faces** then click the **green gear** to access **Marclock's settings**.
 - Once in settings, enter the dataURL API endpoint, the settingsURL API endpoint, and whether you would like to disable alerts. Note that by default, the dataURL endpoint will be the local webservice of http://127.0.0.1:17580/sgv.json and the settingsURL endpoint will be the local webservice of http://127.0.0.1:17580/status.json
 - After starting the webservice in xDrip+/Spike, or after entering the above endpoints, you should be able to see the blood sugars on the watch! 
