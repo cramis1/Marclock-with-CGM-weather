@@ -27,7 +27,7 @@ Units/thresholds are taken from source (e.g., from xdrip).
 
 DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!
 
-This is made and based on the awesome fitbit clockfaces published by PedanticAvenger (FlashCGM) and Rytiggy (Glance). As an amateur coder, this repositories were immensly helpful.
+This is made and based on the awesome fitbit clockfaces published by PedanticAvenger (FlashCGM) and Rytiggy (Glance). As an amateur coder, these repositories were immensly helpful.
 
-Ionic: <img align="middle" src="https://github.com/cramis1/Marclock-with-CGM-weather/Marclock-with-xdrip-screenshot-ionic.png">
-Versa: <img align="middle" src="https://github.com/cramis1/Marclock-with-CGM-weather/Marclock-with-xdrip-screenshot-versa.png">
+Ionic: <img align="middle" src="https://imgur.com/Ys9Eu1p">
+Versa: <img align="middle" src="https://imgur.com/psYb768">
