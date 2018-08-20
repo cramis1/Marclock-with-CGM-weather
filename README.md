@@ -29,5 +29,5 @@ DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!
 
 This is made and based on the awesome fitbit clockfaces published by PedanticAvenger (FlashCGM) and Rytiggy (Glance). As an amateur coder, this repositories were immensly helpful.
 
-Ionic: <img align="middle" src="https://github.com/raymond-richmond/XDrip-Flashring/blob/master/resources/Ionic-Main-May1-2018.png">
-Versa: <img align="middle" src="https://github.com/raymond-richmond/XDrip-Flashring/blob/master/resources/Versa-Main-May1-2018.png">
+Ionic: <img align="middle" src="https://github.com/cramis1/Marclock-with-CGM-weather/Marclock-with-xdrip-screenshot-ionic.png">
+Versa: <img align="middle" src="https://github.com/cramis1/Marclock-with-CGM-weather/Marclock-with-xdrip-screenshot-versa.png">
