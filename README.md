@@ -1,6 +1,6 @@
 ### Interface 
-![ionic](https://imgur.com/Ys9Eu1p "ionic") 
-![versa](https://imgur.com/psYb768 "versa")
+![ionic](https://i.imgur.com/Ys9Eu1p.png "ionic") 
+![versa](https://i.imgur.com/psYb768.png "versa")
 
 # Marclock-with-CGM-weather
 Fitbit Clock Face for Versa and Ionic
