@@ -9,15 +9,25 @@ If you do not know how to load from the developer menu, please look for this app
 This clock face supports Blood Glucose (CGM - continuous glucose monitoring) data from XDrip+, Spike, or Nightscout. 
 
 Includes: 
+
 -Weather
+
 -Heart-rate
+
 -Steps
+
 -Active minutes
+
 -Battery charge level (as text (percentage) and as the size of the arc
+
 -Graph of recent glucose readings
+
 -Current BG reading
+
 -Current delta
+
 -Trend arrow
+
 -Time since last pull
 
 Note that when current BG reading is low, Current BG will turn red and graph point will turn red. When current BG reading is high, Current BG will turn orange and graph point will turn orange. When there is a missed BG reading, Current BG will have a gray strike-through and graph point will turn gray. A current BG of question marks means a connection with your phone (companion) has not been established.
