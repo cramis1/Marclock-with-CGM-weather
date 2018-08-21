@@ -33,6 +33,7 @@ let BGErrorGray2 = false;
 let BGErrorGray3 = false;
 let BGRed = false;
 let BGOrange = false;
+let vibrationTimeout;
 
 //bg variables
 const high = document.getElementById("high");
@@ -45,7 +46,6 @@ const minutesSinceQuery = document.getElementById("minutes");
 const bgDisplay = document.getElementById("bg");
 const strikeLine = document.getElementById("strikeLine");
 
-let showAlertModal = true;
 let prefBgUnits = "mmol";
 let prefHighLevel = 164;
 let prefLowLevel = 74;
@@ -59,6 +59,7 @@ let disableAlert = false;
 let Heartratecheck;
 let previousMuteBG;
 let recordedBG;
+let reminderTimer = 0;
 
 hrm.onreading = function (){
   lblHR.text = `${hrm.heartRate}`;
@@ -255,14 +256,26 @@ colorSet();
   
 // Event occurs when new file(s) are received
 function processBgs(data) {
-      
       points = data.bgdata.sgv;
       trend = data.bgdata.currentTrend;
       lastPollTime = data.bgdata.lastPollTime;
-      latestDelta = data.bgdata.delta;
-      BGErrorGray1 = data.bgdata.BGerror;    
+      latestDelta = data.bgdata.delta; 
   
       let currentBG = points[0];
+      console.log("currentBG: " + currentBG);
+      //reset the colors
+      if ((currentBG < prefHighLevel) && (currentBG > prefLowLevel)){
+        leftArc.style.fill = "greenyellow";
+        bgDisplay.style.fill="white"; 
+        BGRed = false;
+        BGOrange = false;
+        BGErrorGray1 = false;
+        BGErrorGray2 = false;
+        BGErrorGray3 = false;
+      }
+  
+      BGErrorGray1 = data.bgdata.BGerror; 
+  
       processOneBg(currentBG);
       
       if(isNaN(currentBG)) {
@@ -278,68 +291,56 @@ function processBgs(data) {
       
       console.log(currentBG + typeof currentBG);
   
-      
-        if( currentBG >= prefHighLevel) {
+      //alerts
+        if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
          BGOrange = true;
-           if(!disableAlert) { 
+           
+          if(!disableAlert) { 
              if((previousMuteBG - currentBG) > 35){
                 console.log('BG REALLY HIGH') ;
-                showAlertModal = true; 
+                    reminderTimer = (Math.round(Date.now()/1000)) - 10;
                    if(prefBgUnits === 'mmol') {
-                      startVibration("nudge", 3000, ((Math.round(mmol(currentBG)*10))/10));
+                      startAlertProcess("ping", ((Math.round(mmol(currentBG)*10))/10));
                     } else {
-                      startVibration("nudge", 3000, currentBG);
+                      startAlertProcess("ping", currentBG);
                     }
                 } 
-             else if((latestDelta > 0)){
+             else {
                 console.log('BG HIGH') ;
                     if(prefBgUnits === 'mmol') {
-                      startVibration("nudge", 3000, ((Math.round(mmol(currentBG)*10))/10));
+                      startAlertProcess("ping", ((Math.round(mmol(currentBG)*10))/10));
                     } else {
-                      startVibration("nudge", 3000, currentBG);
+                      startAlertProcess("ping", currentBG);
                     }
-              } else {
-                console.log('BG still HIGH, But you are going down') ;
-                showAlertModal = true;
-              }
+              } 
           }   
         } 
          
    
-        if(currentBG <= 55) {
+        if((currentBG <= 55) && ((reminderTimer + 500) <= Math.round(Date.now()/1000))) {
             BGRed = true; 
               
-              if(latestDelta < 0) {
-                  console.log('BG LOW') ;
+                console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
-                  startVibration("nudge-max", 3000, ((Math.round(mmol(currentBG)*10))/10));
+                  startAlertProcess("Confirmation-max", ((Math.round(mmol(currentBG)*10))/10));
                    } else {
-                  startVibration("nudge-max", 3000, currentBG);
-                   }
-                } else {
-                console.log('BG still LOW, But you are going UP') ;
-                showAlertModal = true;
-                }
+                  startAlertProcess("Confirmation-max", currentBG);
+                   } 
             
-        } else if(currentBG <= prefLowLevel) {
+        } else if((currentBG <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
             BGRed = true; 
             if(!disableAlert) {  
-              if(latestDelta < 0) {
                   console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
-                  startVibration("nudge", 3000, ((Math.round(mmol(currentBG)*10))/10));
+                  startAlertProcess("ping", ((Math.round(mmol(currentBG)*10))/10));
                    } else {
-                  startVibration("nudge", 3000, currentBG);
-                   }
-                } else {
-                console.log('BG still LOW, But you are going UP') ;
-                showAlertModal = true;
-                }
-            
-        }
+                  startAlertProcess("ping", currentBG);
+                   } 
+           }
         }
       
+      // graph text axis
       if(prefBgUnits === 'mmol') {  
           let tempprefHighLevel =  (Math.round(mmol(prefHighLevel)*10))/10;
           let tempprefLowLevel = (Math.round(mmol(prefLowLevel)*10))/10;  
@@ -390,10 +391,17 @@ function colorSet (){
       leftArc.style.fill = "red";
       bgDisplay.style.fill="red";
       BGRed = false;
+      BGOrange = false;
+      BGErrorGray1 = false;
+       BGErrorGray2 = false;
+       BGErrorGray3 = false;
   } else if (BGOrange === true){
        leftArc.style.fill = "#FFA500";
        bgDisplay.style.fill="#FFA500";
        BGOrange = false;
+       BGErrorGray1 = false;
+       BGErrorGray2 = false;
+       BGErrorGray3 = false;
   } else if ((BGErrorGray1 === true) || (BGErrorGray2 === true) || (BGErrorGray3 === true)){
        leftArc.style.fill = "#708090"; 
        BGErrorGray1 = false;
@@ -411,22 +419,19 @@ function colorSet (){
 // Deals with Vibrations 
 //
 //----------------------------------------------------------
-let vibrationTimeout; 
+function startAlertProcess(type, message) {
+  showAlert(message);
+  startVibration(type);
+  vibrationTimeout = setTimeout(function(){ startVibration(type); console.log("triggered vibe by setTimeout"); }, 10000);
+}
 
-function startVibration(type, length, message) {
-  if(showAlertModal && (Heartratecheck > 0)){
-    showAlert(message);
-    vibration.start(type);
-    if(length){
-       vibrationTimeout = setTimeout(function(){ startVibration(type, length, message) }, length);
-    }
-  }
-  
+function startVibration(type) {
+  vibration.start(type);
 }
 
 function stopVibration() {
-  vibration.stop();
   clearTimeout(vibrationTimeout);
+  vibration.stop();
 }
 //----------------------------------------------------------
 //
@@ -450,6 +455,7 @@ function showAlert(message) {
 btnLeft.onclick = function(evt) {
   console.log("Mute");
   previousMuteBG = recordedBG;
+  reminderTimer = (Math.round(Date.now()/1000) + 14400);
   myPopup.style.display = "none";
   stopVibration();
    showAlertModal = false;
@@ -457,11 +463,10 @@ btnLeft.onclick = function(evt) {
 }
 
 btnRight.onclick = function(evt) {
+  reminderTimer = (Math.round(Date.now()/1000) + 900);
   console.log("Snooze");
   myPopup.style.display = "none";
   stopVibration();
-  showAlertModal = false;
-  setTimeout(function(){showAlertModal = true}, 900000);
   refrshTimers();
 }
 

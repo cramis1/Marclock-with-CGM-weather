@@ -110,6 +110,11 @@ export default class Graph {
      } else {
      
      this._vals[index].cy = (this._height - (this._height * (Math.round( ( (flippedv[index] - this._ymin) / (this._ymax - this._ymin) )*100 )/100)));
+     
+     if (this._vals[index].cy < 0){
+         this._vals[index].cy = 0;
+         }
+       
      this._vals[index].style.fill = "white"; 
        
        if (flippedv[index] < this._tLow) {
