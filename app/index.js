@@ -28,7 +28,11 @@ const time = document.getElementById("time");
 const icon = document.getElementById("weatherIMG");
 let iconNumber = 800;
 const hrm = new HeartRateSensor();
-let BGErrorRed = false;
+let BGErrorGray1 = false;
+let BGErrorGray2 = false;
+let BGErrorGray3 = false;
+let BGRed = false;
+let BGOrange = false;
 
 //bg variables
 const high = document.getElementById("high");
@@ -209,7 +213,7 @@ function processOneBg(data) {
       strikeLine.style.display = "inline";
       deltaDisplay.text = 'no data';
       setArrowDirection(0);
-      BGErrorRed = true;
+      BGErrorGray3 = true;
   } else {
       console.log("latestDelta:" + latestDelta);
       console.log("recordedBG:" + recordedBG);
@@ -243,16 +247,11 @@ function processOneBg(data) {
         }
       
       strikeLine.style.display = "none";  
-      BGErrorRed = false;
+      
   }
-
-  if (BGErrorRed === true){
-      leftArc.style.fill = "#708090";
-  } else {
-      leftArc.style.fill = "greenyellow";
-      bgDisplay.style.fill="white";
-  }
+colorSet();
 }
+  
   
 // Event occurs when new file(s) are received
 function processBgs(data) {
@@ -261,7 +260,7 @@ function processBgs(data) {
       trend = data.bgdata.currentTrend;
       lastPollTime = data.bgdata.lastPollTime;
       latestDelta = data.bgdata.delta;
-      BGErrorRed = data.bgdata.BGerror;    
+      BGErrorGray1 = data.bgdata.BGerror;    
   
       let currentBG = points[0];
       processOneBg(currentBG);
@@ -270,21 +269,19 @@ function processBgs(data) {
         deltaDisplay.text = 'no data';
         setArrowDirection("even");
         strikeLine.style.display = "inline";
-        BGErrorRed = true;} 
+        BGErrorGray2 = true;} 
       else {
         strikeLine.style.display = "none";
-        BGErrorRed = false;
       }
   
       console.log("points:" + JSON.stringify(points));
       
       console.log(currentBG + typeof currentBG);
   
-      bgDisplay.style.fill="white";
-     
+      
         if( currentBG >= prefHighLevel) {
-         bgDisplay.style.fill="#FFA500";
-         leftArc.style.fill = "#FFA500";
+         
+         BGOrange = true;
            if(!disableAlert) { 
              if((previousMuteBG - currentBG) > 35){
                 console.log('BG REALLY HIGH') ;
@@ -307,14 +304,26 @@ function processBgs(data) {
                 showAlertModal = true;
               }
           }   
-        } else {
-            leftArc.style.fill = "greenyellow";
-            bgDisplay.style.fill="white"
-        }
-
-        if(currentBG <= prefLowLevel) {
-            bgDisplay.style.fill="red";
-            leftArc.style.fill = "red"; 
+        } 
+         
+   
+        if(currentBG <= 55) {
+            BGRed = true; 
+              
+              if(latestDelta < 0) {
+                  console.log('BG LOW') ;
+                  if(prefBgUnits === 'mmol') {
+                  startVibration("nudge-max", 3000, ((Math.round(mmol(currentBG)*10))/10));
+                   } else {
+                  startVibration("nudge-max", 3000, currentBG);
+                   }
+                } else {
+                console.log('BG still LOW, But you are going UP') ;
+                showAlertModal = true;
+                }
+            
+        } else if(currentBG <= prefLowLevel) {
+            BGRed = true; 
             if(!disableAlert) {  
               if(latestDelta < 0) {
                   console.log('BG LOW') ;
@@ -329,30 +338,6 @@ function processBgs(data) {
                 }
             
         }
-        } else {
-            leftArc.style.fill = "greenyellow";
-            bgDisplay.style.fill="white"
-        }
-   
-        if(currentBG <= 55) {
-            bgDisplay.style.fill="red";
-            leftArc.style.fill = "red"; 
-              
-              if(latestDelta < 0) {
-                  console.log('BG LOW') ;
-                  if(prefBgUnits === 'mmol') {
-                  startVibration("nudge-max", 3000, ((Math.round(mmol(currentBG)*10))/10));
-                   } else {
-                  startVibration("nudge-max", 3000, currentBG);
-                   }
-                } else {
-                console.log('BG still LOW, But you are going UP') ;
-                showAlertModal = true;
-                }
-            
-        } else {
-            leftArc.style.fill = "greenyellow";
-            bgDisplay.style.fill="white"
         }
       
       if(prefBgUnits === 'mmol') {  
@@ -397,6 +382,26 @@ function setArrowDirection(delta) {
     arrow.href = "icons/doubleDown.png";
   } else{
     arrow.href = "icons/even.png"; 
+  }
+}
+
+function colorSet (){
+  if (BGRed === true){
+      leftArc.style.fill = "red";
+      bgDisplay.style.fill="red";
+      BGRed = false;
+  } else if (BGOrange === true){
+       leftArc.style.fill = "#FFA500";
+       bgDisplay.style.fill="#FFA500";
+       BGOrange = false;
+  } else if ((BGErrorGray1 === true) || (BGErrorGray2 === true) || (BGErrorGray3 === true)){
+       leftArc.style.fill = "#708090"; 
+       BGErrorGray1 = false;
+       BGErrorGray2 = false;
+       BGErrorGray3 = false;
+  } else {
+      leftArc.style.fill = "greenyellow";
+      bgDisplay.style.fill="white"; 
   }
 }
 
@@ -525,5 +530,6 @@ clock.ontick = (evt) => {
   lblDate.text = `${displayMonth} ${dayofMonth}`;
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;
+  
 }
 
