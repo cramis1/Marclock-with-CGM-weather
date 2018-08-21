@@ -29,9 +29,9 @@ Units/thresholds are taken from source (e.g., from xdrip).
 
 'Disable alert' will disable all alerts except very low BG.
 
-DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!
+**DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!**
 
-This is made and based on the awesome fitbit clockfaces published by PedanticAvenger (FlashCGM) and Rytiggy (Glance). As an amateur coder, these repositories were immensly helpful.
+This is made and based on the awesome fitbit clockfaces published by **PedanticAvenger (FlashCGM)** and **Rytiggy (Glance)**. As an amateur coder, these repositories were immensly helpful.
 
 # Instructions
 - You must have your blood sugars accessible through a URL. (Examples include [xDrip+](https://github.com/jamorham/xDrip-plus), [Nightscout](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku), [Spike](https://spike-app.com/) )
