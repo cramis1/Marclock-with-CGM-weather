@@ -210,12 +210,6 @@ function processOneBg(data) {
   
    recordedBG = data;
    
-  if((!recordedBG) || isNaN(recordedBG)) {
-      strikeLine.style.display = "inline";
-      deltaDisplay.text = 'no data';
-      setArrowDirection(0);
-      BGErrorGray3 = true;
-  } else {
       console.log("latestDelta:" + latestDelta);
       console.log("recordedBG:" + recordedBG);
       console.log("Trend:" + trend);
@@ -249,8 +243,7 @@ function processOneBg(data) {
       
       strikeLine.style.display = "none";  
       
-  }
-colorSet();
+  
 }
   
   
@@ -260,58 +253,48 @@ function processBgs(data) {
       trend = data.bgdata.currentTrend;
       lastPollTime = data.bgdata.lastPollTime;
       latestDelta = data.bgdata.delta; 
+      BGErrorGray1 = data.bgdata.BGerror;
   
       let currentBG = points[0];
       console.log("currentBG: " + currentBG);
-      //reset the colors
-      if ((currentBG < prefHighLevel) && (currentBG > prefLowLevel)){
-        leftArc.style.fill = "greenyellow";
-        bgDisplay.style.fill="white"; 
-        BGRed = false;
-        BGOrange = false;
-        BGErrorGray1 = false;
-        BGErrorGray2 = false;
-        BGErrorGray3 = false;
-      }
-  
-      BGErrorGray1 = data.bgdata.BGerror; 
-  
       processOneBg(currentBG);
       
-      if(isNaN(currentBG)) {
+      if(isNaN(currentBG) || BGErrorGray1 === true) {
         deltaDisplay.text = 'no data';
-        setArrowDirection("even");
+        setArrowDirection("Even");
         strikeLine.style.display = "inline";
-        BGErrorGray2 = true;} 
+        leftArc.style.fill = "#708090"; 
+       
+      } 
       else {
         strikeLine.style.display = "none";
+        colorSet(currentBG); 
       }
   
       console.log("points:" + JSON.stringify(points));
       
       console.log(currentBG + typeof currentBG);
   
-      //alerts
+   
+  //alerts
         if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
-         BGOrange = true;
-           
           if(!disableAlert) { 
              if((previousMuteBG - currentBG) > 35){
                 console.log('BG REALLY HIGH') ;
                     reminderTimer = (Math.round(Date.now()/1000)) - 10;
                    if(prefBgUnits === 'mmol') {
-                      startAlertProcess("ping", ((Math.round(mmol(currentBG)*10))/10));
+                      startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
                     } else {
-                      startAlertProcess("ping", currentBG);
+                      startAlertProcess("nudge-max", currentBG);
                     }
                 } 
              else {
                 console.log('BG HIGH') ;
                     if(prefBgUnits === 'mmol') {
-                      startAlertProcess("ping", ((Math.round(mmol(currentBG)*10))/10));
+                      startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
                     } else {
-                      startAlertProcess("ping", currentBG);
+                      startAlertProcess("nudge-max", currentBG);
                     }
               } 
           }   
@@ -319,23 +302,22 @@ function processBgs(data) {
          
    
         if((currentBG <= 55) && ((reminderTimer + 500) <= Math.round(Date.now()/1000))) {
-            BGRed = true; 
-              
+                          
                 console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
-                  startAlertProcess("Confirmation-max", ((Math.round(mmol(currentBG)*10))/10));
+                  startAlertProcess("confirmation-max", ((Math.round(mmol(currentBG)*10))/10));
                    } else {
-                  startAlertProcess("Confirmation-max", currentBG);
+                  startAlertProcess("confirmation-max", currentBG);
                    } 
             
         } else if((currentBG <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
-            BGRed = true; 
+           
             if(!disableAlert) {  
                   console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
-                  startAlertProcess("ping", ((Math.round(mmol(currentBG)*10))/10));
+                  startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
                    } else {
-                  startAlertProcess("ping", currentBG);
+                  startAlertProcess("nudge-max", currentBG);
                    } 
            }
         }
@@ -352,6 +334,8 @@ function processBgs(data) {
           //middle.text = Math.floor((prefHighLevel + prefLowLevel) *0.5);//Math.floor(ymin + ((ymax-ymin) *0.5));
           low.text = prefLowLevel;
       }
+          
+          //graph inputs
           myGraph.setYRange(36, 250);
           myGraph.setSize(135,80);     
           myGraph.update(points);
@@ -360,6 +344,27 @@ function processBgs(data) {
           low.y = (80 - (80 * (Math.round( ( (prefLowLevel - 36) / (250 - 36) )*100 )/100)));
           
 };
+
+function colorSet(currentBG){
+  //set the colors
+      if ((currentBG < prefHighLevel) && (currentBG > prefLowLevel)){
+        leftArc.style.fill = "greenyellow";
+        bgDisplay.style.fill="white"; 
+        BGErrorGray1 = false;
+      } 
+      if (currentBG <= prefLowLevel){
+      leftArc.style.fill = "red";
+      bgDisplay.style.fill="red";
+      BGErrorGray1 = false;
+      } 
+      if (currentBG >= prefHighLevel){
+       leftArc.style.fill = "#FFA500";
+       bgDisplay.style.fill="#FFA500";
+       BGErrorGray1 = false;
+       
+      } 
+
+}
 
 function setArrowDirection(delta) {
   let arrow = document.getElementById("arrow");
@@ -381,37 +386,15 @@ function setArrowDirection(delta) {
   }
   else if(delta === "DoubleDown") {
     arrow.href = "icons/doubleDown.png";
-  } else{
+  } else if (delta === "Even") {
+    arrow.href = "icons/even.png";
+  } else {
     arrow.href = "icons/even.png"; 
   }
 }
 
-function colorSet (){
-  if (BGRed === true){
-      leftArc.style.fill = "red";
-      bgDisplay.style.fill="red";
-      BGRed = false;
-      BGOrange = false;
-      BGErrorGray1 = false;
-       BGErrorGray2 = false;
-       BGErrorGray3 = false;
-  } else if (BGOrange === true){
-       leftArc.style.fill = "#FFA500";
-       bgDisplay.style.fill="#FFA500";
-       BGOrange = false;
-       BGErrorGray1 = false;
-       BGErrorGray2 = false;
-       BGErrorGray3 = false;
-  } else if ((BGErrorGray1 === true) || (BGErrorGray2 === true) || (BGErrorGray3 === true)){
-       leftArc.style.fill = "#708090"; 
-       BGErrorGray1 = false;
-       BGErrorGray2 = false;
-       BGErrorGray3 = false;
-  } else {
-      leftArc.style.fill = "greenyellow";
-      bgDisplay.style.fill="white"; 
-  }
-}
+
+ 
 
 
 //----------------------------------------------------------
@@ -422,7 +405,7 @@ function colorSet (){
 function startAlertProcess(type, message) {
   showAlert(message);
   startVibration(type);
-  vibrationTimeout = setTimeout(function(){ startVibration(type); console.log("triggered vibe by setTimeout"); }, 10000);
+  vibrationTimeout = setTimeout(function(){ startVibration(type); console.log("triggered vibe by setTimeout"); }, 3000);
 }
 
 function startVibration(type) {
