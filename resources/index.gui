@@ -45,7 +45,7 @@
   <text id="bg" class="h1 status-text" x="1%" y="90%"  text-anchor="start" font-size="60" >??.0</text>
   <text id="minutes" class="status-text" x="3%" y="97%" text-anchor="start" font-size="14">? mins</text>
   
-  <line id="strikeLine" x1="2" y1="207" x2="100" y2="207" fill="#708090" stroke-width="8" display="none" /> 
+  <line id="strikeLine" x1="2" y1="83%" x2="100" y2="83%" fill="#708090" stroke-width="8" display="none" /> 
   
   
   <image id="arrow" href="icons/even.png" visibility="visible" /> <!-- x="34%" y="67%" width="65" height="65" href="icons/even.png" visibility="visible" /> -->
