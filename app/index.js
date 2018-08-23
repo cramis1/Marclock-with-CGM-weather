@@ -257,7 +257,7 @@ function processBgs(data) {
   
       let currentBG = points[0];
       console.log("currentBG: " + currentBG);
-      processOneBg(currentBG);
+       console.log("points:" + JSON.stringify(points));
       
       if(isNaN(currentBG) || BGErrorGray1 === true) {
         deltaDisplay.text = 'no data';
@@ -269,9 +269,10 @@ function processBgs(data) {
       else {
         strikeLine.style.display = "none";
         colorSet(currentBG); 
-      }
+        processOneBg(currentBG);
+      
   
-      console.log("points:" + JSON.stringify(points));
+     
       
       console.log(currentBG + typeof currentBG);
   
@@ -321,8 +322,9 @@ function processBgs(data) {
                    } 
            }
         }
-      
+  }
       // graph text axis
+      console.log("prefhighlevel: " + prefHighLevel + "preflowlevel: " + prefLowLevel);
       if(prefBgUnits === 'mmol') {  
           let tempprefHighLevel =  (Math.round(mmol(prefHighLevel)*10))/10;
           let tempprefLowLevel = (Math.round(mmol(prefLowLevel)*10))/10;  
@@ -337,10 +339,14 @@ function processBgs(data) {
           
           //graph inputs
           myGraph.setYRange(36, 250);
-          myGraph.setSize(135,80);     
+          myGraph.setSize(135, 80);     
           myGraph.update(points);
-          myGraph.setHighLow(164,74);
-          high.y = (80 - (80 * (Math.round( ( (prefHighLevel - 36) / (250 - 36) )*100 )/100)));
+          myGraph.setHighLow(prefHighLevel, prefLowLevel);
+          if ((80 - (80 * (Math.round( ( (prefHighLevel - 36) / (250 - 36) )*100 )/100))) < 0){
+              high.y = 0;
+              } else{
+               high.y = (80 - (80 * (Math.round( ( (prefHighLevel - 36) / (250 - 36) )*100 )/100)));
+            }
           low.y = (80 - (80 * (Math.round( ( (prefLowLevel - 36) / (250 - 36) )*100 )/100)));
           
 };
@@ -368,21 +374,39 @@ function colorSet(currentBG){
 
 function setArrowDirection(delta) {
   let arrow = document.getElementById("arrow");
-     
+  let BGWidth = bgDisplay.getBBox().width;
+  let BGstart = bgDisplay.x;
+  let dWidth = deltaDisplay.getBBox().width;
+  let dStart = deltaDisplay.x;
+    arrow.style.visibility = "visible";
+    arrow.style.display = "inline";
+ 
+  if ((dWidth + dStart) > (BGstart + BGWidth)){
+    arrow.x = dWidth + dStart + 3;
+  } else {
+  
+  arrow.x = BGstart + BGWidth + 3;
+  }
+    
   if(delta === "FortyFiveUp" ) {
     arrow.href = "icons/up.png";
+
   }
   else if(delta === "SingleUp" ) {
    arrow.href = "icons/singleUp.png";
+
   }
   else if(delta === "DoubleUp" ) {
     arrow.href = "icons/doubleUp.png";
+ 
   }
   else if(delta === "FortyFiveDown" ) {
     arrow.href = "icons/down.png";
+
   }
   else if(delta === "SingleDown" ) {
    arrow.href = "icons/singleDown.png";
+
   }
   else if(delta === "DoubleDown") {
     arrow.href = "icons/doubleDown.png";
@@ -441,7 +465,6 @@ btnLeft.onclick = function(evt) {
   reminderTimer = (Math.round(Date.now()/1000) + 14400);
   myPopup.style.display = "none";
   stopVibration();
-   showAlertModal = false;
    refrshTimers();
 }
 
@@ -518,6 +541,7 @@ clock.ontick = (evt) => {
   lblDate.text = `${displayMonth} ${dayofMonth}`;
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;
+  
   
 }
 

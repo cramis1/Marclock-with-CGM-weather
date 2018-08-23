@@ -30,14 +30,27 @@ var points = [220,220,220,220,220,220,220,220,220,220,220,220];
 var currentTimestamp = Math.round(new Date().getTime()/1000);
 var lastTimestamp = 0;
 var latestDelta = 0;
-var dataUrl;
-var settingsUrl;
 var disableAlert = false;
-var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12"
-
+var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 
 //----------------end other variables
+
+ if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
+    dataUrl = getSettings('dataSourceURL').name + "?count=12";
+  } else {
+    dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  }
+  
+  if(getSettings('settingsSourceURL')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+    settingsUrl = getSettings('settingsSourceURL').name;
+  } else {
+    settingsUrl = "http://127.0.0.1:17580/status.json";
+  }
+
+console.log("dataURL: " + dataUrl,
+              "   settingsURL: " + settingsUrl);
+        
 
 
 //----------------------------------------------------------
@@ -48,6 +61,8 @@ var settingsUrl = "http://127.0.0.1:17580/status.json";
 if (initialLocation === true){
   initialLocation = false;
   getLocation();
+  //setTimeout(settingsPoll(), 500);
+  //setTimeout(queryBGD(), 1000);
 }
 
 function getLocation (){
@@ -275,20 +290,20 @@ function buildSettings(settings) {
 
 settingsStorage.onchange = function(evt) {
   
-  if((getSettings('dataSourceURL').name)){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
+  if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
     dataUrl = getSettings('dataSourceURL').name + "?count=12";
   } else {
     dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
   }
-  console.log("dataURL on settings change: " + dataURL);
+  //console.log("dataURL on settings change: " + dataURL);
   
   
-  if(getSettings('settingsSourceURL').name){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+  if(getSettings('settingsSourceURL')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
     settingsUrl = getSettings('settingsSourceURL').name;
   } else {
     settingsUrl = "http://127.0.0.1:17580/status.json";
   }
-  console.log("settingsURL on settings change: " + settingsURL);
+  //console.log("settingsURL on settings change: " + settingsURL);
   
   
   if(settingsStorage.getItem( disableAlert )) {
@@ -297,6 +312,8 @@ settingsStorage.onchange = function(evt) {
   } else {
     disableAlert = false;
   }
+settingsPoll();
+setTimeout(queryBGD(), 500);
 } 
 
 function getSettings(key) {

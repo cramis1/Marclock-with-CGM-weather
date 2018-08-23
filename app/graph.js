@@ -93,7 +93,7 @@ export default class Graph {
     
    var flippedv = v.reverse(); 
    console.log("Updating Graph:" + JSON.stringify(flippedv) + " into this many graph points:" + this._vals.length);
-    console.log("height: " + this._height + " t high:" + this._tHigh + " ymax:" + this._ymax + " ymin" + this._ymin) ;
+    console.log("height: " + this._height + " t_high:" + this._tHigh + " ymax:" + this._ymax + " ymin" + this._ymin) ;
     console.log(" y1: " + (this._height - (this._height * (Math.round( ( (this._tHigh - this._ymin) / (this._ymax - this._ymin) )*100 )/100))));  
    
    
@@ -117,10 +117,10 @@ export default class Graph {
        
      this._vals[index].style.fill = "white"; 
        
-       if (flippedv[index] < this._tLow) {
+       if (flippedv[index] <= this._tLow) {
          this._vals[index].style.fill = "red";
        }
-       else if (flippedv[index] > this._tHigh) {
+       else if (flippedv[index] >= this._tHigh) {
          this._vals[index].style.fill = "#FFA500";
        }
      }

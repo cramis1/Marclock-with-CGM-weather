@@ -56,9 +56,9 @@
       <svg class="graphset" >  <!--x="60%-24" y="65%+3" width="135" height="80"> -->
         <use href="#graph" id="docGraph" x="0" y="0" width="100%" height="100%" />
     
-        <text id="high" class="status-text" x="99%" y="40%"  text-anchor="start">hi</text>
+        <text id="high" class="status-text" x="97%" y="40%"  text-anchor="start">hi</text>
        <!-- <text id="middle" class="status-text" x="91%" y="65%+50"  text-anchor="start">mid</text> -->     
-        <text id="low" class="status-text" x="99%" y="88%"  text-anchor="start">low</text>  
+        <text id="low" class="status-text" x="97%" y="88%"  text-anchor="start">low</text>  
          </svg>
   
   <!-- Alert -->
