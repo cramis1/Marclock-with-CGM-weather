@@ -206,7 +206,7 @@ function mmol( bg ) {
 
 function processOneBg(data) {
   console.log("bg data is: " + data + " prefBGunits is: " + prefBgUnits);
-  setArrowDirection(trend);
+  
   
    recordedBG = data;
    
@@ -243,7 +243,7 @@ function processOneBg(data) {
       
       strikeLine.style.display = "none";  
       
-  
+  setArrowDirection(trend);
 }
   
   
