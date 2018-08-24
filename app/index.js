@@ -56,6 +56,7 @@ let lastPollTime = (Math.round(Date.now()/1000));
 let weatherCount = 7;
 let settingsCount = 4;
 let disableAlert = false;
+let snoozeLength = 15;
 let Heartratecheck;
 let previousMuteBG;
 let recordedBG;
@@ -191,6 +192,7 @@ function updateSettings(data) {
       prefHighLevel = data.settings.bgHighLevel;
       prefLowLevel = data.settings.bgLowLevel;
       disableAlert = data.settings.disableAlert;
+      snoozeLength = data.settings.snoozeLength;
     }
 
 //----------------------------------------------------------
@@ -275,6 +277,7 @@ function processBgs(data) {
      
       
       console.log(currentBG + typeof currentBG);
+         console.log('reminder timer left: ' + (reminderTimer - Math.round(Date.now()/1000)))
   
    
   //alerts
@@ -468,7 +471,15 @@ btnLeft.onclick = function(evt) {
 }
 
 btnRight.onclick = function(evt) {
-  reminderTimer = (Math.round(Date.now()/1000) + 900);
+  let snoozeInt = parseInt(snoozeLength,10);
+  console.log("Snooze length" + snoozeInt);
+  if ((snoozeInt >= 1) && (snoozeInt <= 240) ){
+  reminderTimer = (Math.round(Date.now()/1000) + (snoozeInt*60) );
+  console.log("Snooze for " + snoozeInt);
+  } else {
+  reminderTimer = (Math.round(Date.now()/1000) + 900 );
+  console.log("Snooze for 15 - default");
+  }
   console.log("Snooze");
   myPopup.style.display = "none";
   stopVibration();

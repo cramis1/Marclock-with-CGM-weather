@@ -31,6 +31,7 @@ var currentTimestamp = Math.round(new Date().getTime()/1000);
 var lastTimestamp = 0;
 var latestDelta = 0;
 var disableAlert = false;
+var snoozeLength = 15;
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 
@@ -273,7 +274,8 @@ function buildSettings(settings) {
       "bgTargetBottom" : bgTargetBottom,
       "bgHighLevel" : bgHighLevel,
       "bgLowLevel" : bgLowLevel,
-      "disableAlert": disableAlert
+      "disableAlert": disableAlert,
+      "snoozeLength": snoozeLength
     },
   }; // end of messageContent
   console.log(JSON.stringify(messageContent));
@@ -312,6 +314,13 @@ settingsStorage.onchange = function(evt) {
   } else {
     disableAlert = false;
   }
+  
+  if(getSettings('snoozeLength')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+    snoozeLength = getSettings('snoozeLength');
+  } else {
+    snoozeLength = 15;
+  }
+  
 settingsPoll();
 setTimeout(queryBGD(), 500);
 } 
