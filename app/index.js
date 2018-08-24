@@ -33,7 +33,7 @@ let BGErrorGray2 = false;
 let BGErrorGray3 = false;
 let BGRed = false;
 let BGOrange = false;
-let vibrationTimeout;
+let vibrationInterval;
 
 //bg variables
 const high = document.getElementById("high");
@@ -428,8 +428,7 @@ function setArrowDirection(delta) {
 //----------------------------------------------------------
 function startAlertProcess(type, message) {
   showAlert(message);
-  startVibration(type);
-  vibrationTimeout = setTimeout(function(){ startVibration(type); console.log("triggered vibe by setTimeout"); }, 3000);
+  vibrationInterval = setInterval(startVibration(type), 4500);
 }
 
 function startVibration(type) {
@@ -437,7 +436,7 @@ function startVibration(type) {
 }
 
 function stopVibration() {
-  clearTimeout(vibrationTimeout);
+  clearInterval(vibrationInterval);
   vibration.stop();
 }
 //----------------------------------------------------------
