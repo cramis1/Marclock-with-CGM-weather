@@ -428,15 +428,15 @@ function setArrowDirection(delta) {
 //----------------------------------------------------------
 function startAlertProcess(type, message) {
   showAlert(message);
-  vibrationInterval = setInterval(startVibration(type), 4500);
+  vibration.start(type);
+  console.log('vibration')
+  vibrationInterval = setTimeout(function(){ startAlertProcess(type, message) }, 3000);
 }
 
-function startVibration(type) {
-  vibration.start(type);
-}
+
 
 function stopVibration() {
-  clearInterval(vibrationInterval);
+  clearTimeout(vibrationInterval);
   vibration.stop();
 }
 //----------------------------------------------------------
