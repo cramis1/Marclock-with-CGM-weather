@@ -6,7 +6,7 @@ Versa:
 # Marclock-with-CGM-weather
 Fitbit Clock Face for Versa and Ionic
 
-If you do not know how to load from the developer menu, please look for this app in the fitbit clock face gallery as "Marclock with CGM & weather".
+**If you do not know how to load from the developer menu, please look for this app in the fitbit clock face gallery as "Marclock CGM & Weather". Or click on this link from your phone: [Marclock CGM & Weather](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9)**
 
 This clock face supports Blood Glucose (CGM - continuous glucose monitoring) data from XDrip+, Spike, or Nightscout. 
 
