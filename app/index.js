@@ -483,6 +483,7 @@ btnRight.onclick = function(evt) {
 
 messaging.peerSocket.onopen = function() {
   console.log("App Socket Open");
+  initialCall();
 }
 
 messaging.peerSocket.onerror = function(err) {
