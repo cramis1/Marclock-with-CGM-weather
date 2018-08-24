@@ -21,9 +21,9 @@ Includes:
 - Current BG reading
 - Current delta
 - Trend arrow
-- Time since last pull
+- Time since last pull from Xdrip (Xdrip only pushes data once every 5 mins)
 
-Note that when current BG reading is low, Current BG will turn red and graph point will turn red. When current BG reading is high, Current BG will turn orange and graph point will turn orange. When there is a missed BG reading, Current BG will have a gray strike-through and graph point will turn gray. A current BG of question marks means a connection with your phone (companion) has not been established.
+Note that when current BG reading is low, Current BG will turn red and graph point will turn red. When current BG reading is high, Current BG will turn orange and graph point will turn orange. When there is a missed BG reading, Current BG will have a gray strike-through and graph point will turn gray. A current BG of question marks means a connection with your phone (companion) has not been established, try tapping on the screen to refetch the data from Xdrip.
 
 You can re-fetch BG and weather AT ANY TIME by clicking on the screen.
 
