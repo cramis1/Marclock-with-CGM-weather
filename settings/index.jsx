@@ -44,9 +44,24 @@ function mySettings(props) {
       <Toggle
             settingsKey="disableAlert"
             label="Disable Alerts"
+
           />
         </Section>
-    </Page> 
+       <Section>
+        <Text>
+          Weather Unit
+         </Text>
+             
+      <Select
+            settingsKey="selection"
+            label="Select"
+            options={[
+             {name:"celsius"},
+             {name:"fahrenheit"}
+             ]}
+          />
+        </Section>
+    </Page>  
   );
 }
 

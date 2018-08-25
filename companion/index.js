@@ -32,6 +32,7 @@ var lastTimestamp = 0;
 var latestDelta = 0;
 var disableAlert = false;
 var snoozeLength = 15;
+var weatherUnitF = "celsius";
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 
@@ -267,7 +268,7 @@ function buildSettings(settings) {
   bgTargetBottom = obj.settings.thresholds.bgTargetBottom;
   bgDataUnits = obj.settings.units;
   settingsStorage.setItem("unitsType", JSON.stringify(bgDataUnits));
-  
+  console.log("bgDataUnits:" + bgDataUnits);
   const messageContent = {"settings": {
       "bgDataUnits" : bgDataUnits,
       "bgTargetTop" : bgTargetTop,
@@ -275,7 +276,8 @@ function buildSettings(settings) {
       "bgHighLevel" : bgHighLevel,
       "bgLowLevel" : bgLowLevel,
       "disableAlert": disableAlert,
-      "snoozeLength": snoozeLength
+      "snoozeLength": snoozeLength,
+      "weatherUnitF": weatherUnitF
     },
   }; // end of messageContent
   console.log(JSON.stringify(messageContent));
@@ -309,7 +311,7 @@ settingsStorage.onchange = function(evt) {
   
   
   if(settingsStorage.getItem( disableAlert )) {
-    disableAlert = JSON.parse(settingsStorage.getItem( key ));
+    disableAlert = JSON.parse(settingsStorage.getItem( disableAlert ));
     console.log("disableAlert on settings change: " + disableAlert)
   } else {
     disableAlert = false;
@@ -321,6 +323,14 @@ settingsStorage.onchange = function(evt) {
     snoozeLength = 15;
   }
   
+  if(getSettings('selection')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+    weatherUnitF = getSettings('selection').values[0].name;
+  } else {
+    weatherUnitF = "celsius";
+  }
+  console.log("temp setting: " + weatherUnitF);
+  
+    
 settingsPoll();
 setTimeout(queryBGD(), 500);
 } 

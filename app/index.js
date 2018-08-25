@@ -57,6 +57,8 @@ let weatherCount = 7;
 let settingsCount = 4;
 let disableAlert = false;
 let snoozeLength = 15;
+let weatherUnitF = "celsius";
+let tempRead;
 let Heartratecheck;
 let previousMuteBG;
 let recordedBG;
@@ -144,7 +146,12 @@ function processWeatherData(data) {
   console.log("The temperature is: " + Math.round(data.weather.temperature));
   
   if(isNaN(data.weather.temperature)){} else {
-    lblDist.text = Math.round(data.weather.temperature) + "°C";
+    if (weatherUnitF === "fahrenheit") {
+    lblDist.text = Math.round( (((data.weather.temperature) * 9) / 5) + 32 ) + "°F";
+    } else {
+      lblDist.text = Math.round(data.weather.temperature) + "°C";
+    }
+    tempRead = data.weather.temperature;
     iconNumber = data.weather.icon;
   }
   
@@ -193,7 +200,16 @@ function updateSettings(data) {
       prefLowLevel = data.settings.bgLowLevel;
       disableAlert = data.settings.disableAlert;
       snoozeLength = data.settings.snoozeLength;
+      weatherUnitF = data.settings.weatherUnitF;
+  
+  if (weatherUnitF === "fahrenheit") {
+    lblDist.text = Math.round( (((tempRead) * 9) / 5) + 32 ) + "°F";
+    } else {
+      lblDist.text = Math.round(tempRead) + "°C";
     }
+ 
+
+}
 
 //----------------------------------------------------------
 //
