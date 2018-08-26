@@ -52,5 +52,6 @@ This is made and based on the awesome fitbit clockfaces published by **PedanticA
   - If you are using **Spike**  
     - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
     - Point the watch face to the following URL (API Endpoint): `http://127.0.0.1:1979/sgv.json`
+    - Point the settings API URL to 'http://127.0.0.1:1979/api/v1/status.json'
 
 Twitter: @cramis123
