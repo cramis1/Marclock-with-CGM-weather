@@ -40,10 +40,13 @@
 
   <text id="hr"  > -- bpm</text>
   
+  
+  
   <!--Start of BG stuff-->
   <text id="delta" class="status-text" x="1%" y="71%" text-anchor="start" font-size="18">???</text>
   <text id="bg" class="h1 status-text" x="1%" y="90%"  text-anchor="start" font-size="60" >??.0</text>
-  <text id="minutes" class="status-text" x="3%" y="97%" text-anchor="start" font-size="14">? mins</text>
+  <text id="minutes" class="status-text" x="3%" y="97%" text-anchor="start" font-size="14" >? mins</text>
+  <text id="iob" class="status-text" x="17%" y="97%" text-anchor="start" font-size="14" text-length="12" display="none">-.-i/-c</text>
   
   <line id="strikeLine" x1="2" y1="83%" x2="100" y2="83%" fill="#708090" stroke-width="8" display="none" /> 
   

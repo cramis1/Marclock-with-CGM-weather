@@ -45,6 +45,11 @@ const deltaDisplay = document.getElementById("delta");
 const minutesSinceQuery = document.getElementById("minutes");
 const bgDisplay = document.getElementById("bg");
 const strikeLine = document.getElementById("strikeLine");
+const myPopup = document.getElementById("popup");
+const btnLeft = myPopup.getElementById("btnLeft");
+const btnRight = myPopup.getElementById("btnRight");
+const alertHeader = document.getElementById("alertHeader");
+let iobcob = document.getElementById("iob");
 
 let prefBgUnits = "mmol";
 let prefHighLevel = 164;
@@ -104,11 +109,11 @@ function updateBGPollingStatus() {
 } 
 
 function requestData(DataType) {
-  console.log("Asking for a data update from companion.");
+  //console.log("Asking for a data update from companion.");
   var messageContent = {"RequestType" : DataType };
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
       messaging.peerSocket.send(messageContent);
-      console.log("Sent request to companion.");
+     // console.log("Sent request to companion.");
   } else {
       console.log("companion - no connection");
       //setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
@@ -125,7 +130,8 @@ function refrshTimers(){
 }
 
 function initialCall(){
-    clearInterval(mainTimer);
+    
+  clearInterval(mainTimer);
     clearTimeout(weatherTimer);
     weatherCount = 0;
     settingsCount = 0;
@@ -143,7 +149,7 @@ function initialCall(){
 //----------------------------------------------------------
 function processWeatherData(data) {
  
-  console.log("The temperature is: " + Math.round(data.weather.temperature));
+  //console.log("The temperature is: " + Math.round(data.weather.temperature));
   
   if(isNaN(data.weather.temperature)){} else {
     if (weatherUnitF === "fahrenheit") {
@@ -157,31 +163,31 @@ function processWeatherData(data) {
   
   if (iconNumber > 800 && iconNumber < 806) {
     icon.href = "icons/cloudy.png";
-    console.log("The icon is cloudy");
+    //console.log("The icon is cloudy");
     
   } else if (iconNumber > 599 && iconNumber < 625){
     icon.href = "icons/snow.png";    
-    console.log("The icon is snow");
+  //  console.log("The icon is snow");
     
     } 
   else if (iconNumber > 499 && iconNumber < 550){
     icon.href = "icons/rain.png";
-    console.log("The icon is rain");
+ //   console.log("The icon is rain");
     
     }
   else if (iconNumber > 299 && iconNumber < 350){
     icon.href = "icons/drizzle.png";    
-    console.log("The icon is drizzle");
+   //console.log("The icon is drizzle");
     
     }
   else if (iconNumber > 199 && iconNumber < 250){
     icon.href = "icons/thunder.png";   
-    console.log("The icon is thunder");
+   // console.log("The icon is thunder");
     
     }
   else {
     icon.href = "icons/sunny.png";
-    console.log("The icon is sunny");
+   // console.log("The icon is sunny");
     
   }
 }
@@ -223,14 +229,14 @@ function mmol( bg ) {
 }
 
 function processOneBg(data) {
-  console.log("bg data is: " + data + " prefBGunits is: " + prefBgUnits);
+ // console.log("bg data is: " + data + " prefBGunits is: " + prefBgUnits);
   
   
    recordedBG = data;
    
-      console.log("latestDelta:" + latestDelta);
-      console.log("recordedBG:" + recordedBG);
-      console.log("Trend:" + trend);
+     // console.log("latestDelta:" + latestDelta);
+     // console.log("recordedBG:" + recordedBG);
+     // console.log("Trend:" + trend);
       
       
         if(prefBgUnits === 'mmol') { 
@@ -246,7 +252,7 @@ function processOneBg(data) {
         
         } else{
             if (latestDelta > 0) {
-              deltaDisplay.text = "+" (Math.round(latestDelta)) + " mg/dl";
+              deltaDisplay.text = "+" + (Math.round(latestDelta)) + " mg/dl";
             } else {
               deltaDisplay.text = (Math.round(latestDelta)) + " mg/dl";
             }
@@ -272,9 +278,34 @@ function processBgs(data) {
       lastPollTime = data.bgdata.lastPollTime;
       latestDelta = data.bgdata.delta; 
       BGErrorGray1 = data.bgdata.BGerror;
-  
-      let currentBG = points[0];
-      console.log("currentBG: " + currentBG);
+      
+      
+      let iob = data.bgdata.iob;
+      let cob = data.bgdata.cob;
+      let iobtemp;
+      let cobtemp;
+      if ((iob > 0) || (cob > 0)){
+          iobcob.style.display = "inline";
+          if(isNaN(iob)) {
+            iobtemp = "--";
+          } else {
+            iobtemp = iob.toFixed(1);
+          }
+           if(isNaN(cob)) {
+            cobtemp = "-";
+          } else {
+            cobtemp = cob.toFixed(0);
+          }
+          iobcob.text = " - " + iobtemp + "i/" + cobtemp + "c";
+          //console.log(iobcob.text)
+          let minutesWidth = minutesSinceQuery.getBBox().width;
+          iobcob.x = (minutesWidth) + (minutesSinceQuery.x) + 10;
+      } else {
+        iobcob.style.display = "none";
+      }
+      
+  let currentBG = points[0];
+     // console.log("currentBG: " + currentBG);
        console.log("points:" + JSON.stringify(points));
       
       if(isNaN(currentBG) || BGErrorGray1 === true) {
@@ -292,16 +323,16 @@ function processBgs(data) {
   
      
       
-      console.log(currentBG + typeof currentBG);
-         console.log('reminder timer left: ' + (reminderTimer - Math.round(Date.now()/1000)))
-  
+     // console.log(currentBG + typeof currentBG);
+      //   console.log('reminder timer left: ' + (reminderTimer - Math.round(Date.now()/1000)))
+  //
    
   //alerts
         if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
           if(!disableAlert) { 
              if((previousMuteBG - currentBG) > 35){
-                console.log('BG REALLY HIGH') ;
+              //  console.log('BG REALLY HIGH') ;
                     reminderTimer = (Math.round(Date.now()/1000)) - 10;
                    if(prefBgUnits === 'mmol') {
                       startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
@@ -310,7 +341,7 @@ function processBgs(data) {
                     }
                 } 
              else {
-                console.log('BG HIGH') ;
+               // console.log('BG HIGH') ;
                     if(prefBgUnits === 'mmol') {
                       startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
                     } else {
@@ -323,7 +354,7 @@ function processBgs(data) {
    
         if((currentBG <= 55) && ((reminderTimer + 500) <= Math.round(Date.now()/1000))) {
                           
-                console.log('BG VERY LOW') ;
+               // console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("confirmation-max", ((Math.round(mmol(currentBG)*10))/10));
                    } else {
@@ -333,7 +364,7 @@ function processBgs(data) {
         } else if((currentBG <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
            
             if(!disableAlert) {  
-                  console.log('BG LOW') ;
+                //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
                    } else {
@@ -343,7 +374,7 @@ function processBgs(data) {
         }
   }
       // graph text axis
-      console.log("prefhighlevel: " + prefHighLevel + "preflowlevel: " + prefLowLevel);
+     // console.log("prefhighlevel: " + prefHighLevel + "preflowlevel: " + prefLowLevel);
       if(prefBgUnits === 'mmol') {  
           let tempprefHighLevel =  (Math.round(mmol(prefHighLevel)*10))/10;
           let tempprefLowLevel = (Math.round(mmol(prefLowLevel)*10))/10;  
@@ -448,7 +479,7 @@ function setArrowDirection(delta) {
 function startAlertProcess(type, message) {
   showAlert(message);
   vibration.start(type);
-  console.log('vibration')
+ // console.log('vibration')
   vibrationInterval = setTimeout(function(){ startAlertProcess(type, message) }, 3000);
 }
 
@@ -470,15 +501,15 @@ let alertHeader = document.getElementById("alertHeader");
 
 
 function showAlert(message) {
-  console.log('ALERT BG')
-  console.log(message); 
+ // console.log('ALERT BG')
+  //console.log(message); 
   alertHeader.text = message;
   myPopup.style.display = "inline";
  
 }
 
 btnLeft.onclick = function(evt) {
-  console.log("Mute");
+  //console.log("Mute");
   previousMuteBG = recordedBG;
   reminderTimer = (Math.round(Date.now()/1000) + 14400);
   myPopup.style.display = "none";
@@ -488,15 +519,15 @@ btnLeft.onclick = function(evt) {
 
 btnRight.onclick = function(evt) {
   let snoozeInt = parseInt(snoozeLength,10);
-  console.log("Snooze length" + snoozeInt);
+ // console.log("Snooze length" + snoozeInt);
   if ((snoozeInt >= 1) && (snoozeInt <= 240) ){
   reminderTimer = (Math.round(Date.now()/1000) + (snoozeInt*60) );
-  console.log("Snooze for " + snoozeInt);
+ // console.log("Snooze for " + snoozeInt);
   } else {
   reminderTimer = (Math.round(Date.now()/1000) + 900 );
-  console.log("Snooze for 15 - default");
+  //console.log("Snooze for 15 - default");
   }
-  console.log("Snooze");
+ // console.log("Snooze");
   myPopup.style.display = "none";
   stopVibration();
   refrshTimers();
@@ -509,7 +540,7 @@ btnRight.onclick = function(evt) {
 //----------------------------------------------------------
 
 messaging.peerSocket.onopen = function() {
-  console.log("App Socket Open");
+ // console.log("App Socket Open");
   initialCall();
 }
 
@@ -547,7 +578,7 @@ for (var i = 0; i < svgclass.length; i++) {
 
 //update with clock tick
 clock.ontick = (evt) => {
-  console.log("JS memory: " + memory.js.used + "/" + memory.js.total+ "---peak:" + memory.js.peak);
+  //console.log("JS memory: " + memory.js.used + "/" + memory.js.total+ "---peak:" + memory.js.peak);
   charge = battery.chargeLevel;
   const now = evt.date;
   const month = now.getMonth();

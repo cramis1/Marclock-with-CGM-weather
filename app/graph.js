@@ -70,7 +70,7 @@ export default class Graph {
    this._ymin = ymin;
    this._ymax = ymax;
    this._yscale = (ymax-ymin)/80;
-   console.log("YSCALE: " + this._yscale);
+   //console.log("YSCALE: " + this._yscale);
    
  } 
 
@@ -92,9 +92,9 @@ export default class Graph {
   update(v){
     
    var flippedv = v.reverse(); 
-   console.log("Updating Graph:" + JSON.stringify(flippedv) + " into this many graph points:" + this._vals.length);
-    console.log("height: " + this._height + " t_high:" + this._tHigh + " ymax:" + this._ymax + " ymin" + this._ymin) ;
-    console.log(" y1: " + (this._height - (this._height * (Math.round( ( (this._tHigh - this._ymin) / (this._ymax - this._ymin) )*100 )/100))));  
+  // console.log("Updating Graph:" + JSON.stringify(flippedv) + " into this many graph points:" + this._vals.length);
+   // console.log("height: " + this._height + " t_high:" + this._tHigh + " ymax:" + this._ymax + " ymin" + this._ymin) ;
+   // console.log(" y1: " + (this._height - (this._height * (Math.round( ( (this._tHigh - this._ymin) / (this._ymax - this._ymin) )*100 )/100))));  
    
    
    for (var index = 0; index < this._vals.length; index++) {

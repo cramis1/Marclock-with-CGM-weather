@@ -35,6 +35,8 @@ var snoozeLength = 15;
 var weatherUnitF = "celsius";
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
+var manualHighLow;
+var BGUnitSelect;
 
 //----------------end other variables
 
@@ -50,8 +52,15 @@ var settingsUrl = "http://127.0.0.1:17580/status.json";
     settingsUrl = "http://127.0.0.1:17580/status.json";
   }
 
-console.log("dataURL: " + dataUrl,
-              "   settingsURL: " + settingsUrl);
+if(getSettings( 'viewSettingSelect' )) {
+    manualHighLow = getSettings('viewSettingSelect');
+    //console.log("manual high low: " + manualHighLow)
+  } else {
+    manualHighLow = false;
+  }
+
+//console.log("dataURL: " + dataUrl,
+              //"   settingsURL: " + settingsUrl);
         
 
 
@@ -74,7 +83,7 @@ function getLocation (){
     console.log("Latitude: " + position.coords.latitude + " Longitude: " + position.coords.longitude);
       latitude = Math.round((position.coords.latitude) * 100) / 100;
       longtitude = Math.round((position.coords.longitude) * 100) / 100;
-      console.log("Discovered lat and long: " + latitude + ", " + longtitude);
+      //console.log("Discovered lat and long: " + latitude + ", " + longtitude);
     }
 
     function locationError(error) {
@@ -91,8 +100,8 @@ setInterval(getLocation, 900000);
 //
 //----------------------------------------------------------
 function queryOW() {
-  console.log("Companion fetching weather");
-  console.log("lat and long: " + latitude + ", " + longtitude);
+  //console.log("Companion fetching weather");
+  //console.log("lat and long: " + latitude + ", " + longtitude);
   fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY)
   .then(function (response) {
       response.json()
@@ -129,7 +138,7 @@ function queryOW() {
 //----------------------------------------------------------
 function queryBGD () {
   
-  console.log("fetch BG- dataUrl:" + dataUrl)
+  //console.log("fetch BG- dataUrl:" + dataUrl)
   
   fetch(dataUrl,{
       method: 'GET',
@@ -140,7 +149,7 @@ function queryBGD () {
     })
   .then(response => {
        response.text().then(data => {
-          console.log('fetched Data from API');
+          //console.log('fetched Data from API');
           //let obj = JSON.parse(data);
           let returnval = buildGraphData(data);
           BGError = false;
@@ -195,6 +204,8 @@ function buildGraphData(data) {
   }
   lastTimestamp = parseInt(lastTimestamp/1000, 10);
   latestDelta = obj[0].delta;
+  let iob = obj[0].IOB;
+  let cob = obj[0].COB;
   //var flippedPoints = points.reverse();
         lastTimestamp = obj[0].date;
         bgTrend = obj[0].direction;
@@ -203,7 +214,9 @@ function buildGraphData(data) {
       "lastPollTime": lastTimestamp, 
       "currentTrend": bgTrend,
       "delta": latestDelta,
-      "BGerror": BGError
+      "BGerror": BGError,
+      "iob": iob,
+      "cob": cob
     }
   };
   console.log(JSON.stringify(messageContent));
@@ -224,9 +237,18 @@ function buildGraphData(data) {
 //
 //----------------------------------------------------------
 
-function settingsPoll () {
+function settingsPoll (){
+  console.log("manualHighLow " + manualHighLow)
+  if (manualHighLow === true) {
+    settingsPollManual();
+  } else {
+    settingsPollAPI();
+  }
+}
+
+function settingsPollAPI () {
        
-       console.log('get settings - settingsUrl' + settingsUrl);
+       //console.log('get settings - settingsUrl' + settingsUrl);
     
        fetch(settingsUrl, {
         method: 'GET',
@@ -238,7 +260,7 @@ function settingsPoll () {
         .then(response => {
    //       console.log('Get Settings From Phone');
           response.text().then(statusreply => {
-            console.log("fetched settings from API");
+           // console.log("fetched settings from API");
             let returnval = buildSettings(statusreply);
           })
             .catch(responseParsingError => {
@@ -264,15 +286,15 @@ function buildSettings(settings) {
   
   bgHighLevel = obj.settings.thresholds.bgHigh;
   bgLowLevel = obj.settings.thresholds.bgLow;
-  bgTargetTop = obj.settings.thresholds.bgTargetTop;
-  bgTargetBottom = obj.settings.thresholds.bgTargetBottom;
   bgDataUnits = obj.settings.units;
+ 
+  //bgTargetTop = obj.settings.thresholds.bgTargetTop;
+  //bgTargetBottom = obj.settings.thresholds.bgTargetBottom;
+  
   settingsStorage.setItem("unitsType", JSON.stringify(bgDataUnits));
-  console.log("bgDataUnits:" + bgDataUnits);
+  //console.log("bgDataUnits:" + bgDataUnits);
   const messageContent = {"settings": {
       "bgDataUnits" : bgDataUnits,
-      "bgTargetTop" : bgTargetTop,
-      "bgTargetBottom" : bgTargetBottom,
       "bgHighLevel" : bgHighLevel,
       "bgLowLevel" : bgLowLevel,
       "disableAlert": disableAlert,
@@ -291,6 +313,36 @@ function buildSettings(settings) {
   }
   return true;
 }
+
+
+function settingsPollManual() {
+  if (bgDataUnits === "mmol") {
+      bgHighLevel = Math.round(bgHighLevel * 18.018018018018);
+      bgLowLevel = Math.round(bgLowLevel * 18.018018018018);
+   }
+  
+  const messageContent = {"settings": {
+      "bgDataUnits" : bgDataUnits,
+      "bgHighLevel" : bgHighLevel,
+      "bgLowLevel" : bgLowLevel,
+      "disableAlert": disableAlert,
+      "snoozeLength": snoozeLength,
+      "weatherUnitF": weatherUnitF
+    },
+  }; // end of messageContent
+  console.log(JSON.stringify(messageContent));
+  if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
+    messaging.peerSocket.send(messageContent);
+  } else {
+    console.log("companion - no connection");
+    //me.wakeInterval = 2000;
+    setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
+    //me.wakeInterval = undefined;
+  }
+  return true;
+  
+}
+
 
 settingsStorage.onchange = function(evt) {
   
@@ -312,7 +364,7 @@ settingsStorage.onchange = function(evt) {
   
   if(settingsStorage.getItem( disableAlert )) {
     disableAlert = JSON.parse(settingsStorage.getItem( disableAlert ));
-    console.log("disableAlert on settings change: " + disableAlert)
+    //console.log("disableAlert on settings change: " + disableAlert)
   } else {
     disableAlert = false;
   }
@@ -328,9 +380,39 @@ settingsStorage.onchange = function(evt) {
   } else {
     weatherUnitF = "celsius";
   }
-  console.log("temp setting: " + weatherUnitF);
+  //console.log("temp setting: " + weatherUnitF);
   
-    
+ if(getSettings( 'viewSettingSelect' )) {
+    manualHighLow = getSettings('viewSettingSelect');
+    //console.log("manual high low: " + manualHighLow)
+  } else {
+    manualHighLow = false;
+  }
+  
+  if (manualHighLow === true){
+  
+    if(getSettings("highThresholdIn")){
+        bgHighLevel = getSettings("highThresholdIn").name
+      } else {
+        bgHighLevel = 164
+      }
+
+      if(getSettings("lowThresholdIn")){
+       bgLowLevel = getSettings("lowThresholdIn").name
+      } else {
+       bgLowLevel = 72
+      }
+      
+        if(getSettings( 'BGUnitSelect' )) {
+        bgDataUnits = getSettings('BGUnitSelect').values[0].name;
+        //console.log("bg settings unit: " + bgDataUnits)
+      } else {
+        bgDataUnits = "mmol";
+      }
+    console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
+  }
+
+
 settingsPoll();
 setTimeout(queryBGD(), 500);
 } 
@@ -342,6 +424,7 @@ function getSettings(key) {
     return undefined
   }
 }
+
 
 //----------------------------------------------------------
 //

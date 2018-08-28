@@ -4,23 +4,58 @@ function mySettings(props) {
       <Section>
         {<Text bold align="center">Data Source Settings</Text>}
         
-        <TextInput
-          defaultValue="http://127.0.0.1:17580/status.json"
-          settingsKey="settingsSourceURL"
-          label="Click to Enter Settings API URL"
-        />
-        <Text>
-          Default is <Link source="http://127.0.0.1:17580/status.json">http://127.0.0.1:17580/status.json</Link>
-          </Text>
-        <TextInput
+         <TextInput
           settingsKey="dataSourceURL"
           label="Click to Enter Data API URL"
           defaultValue="http://127.0.0.1:17580/sgv.json"
+          
         />
         <Text>
           Default is <Link source="http://127.0.0.1:17580/sgv.json?count=12">http://127.0.0.1:17580/sgv.json</Link>
           </Text>
+        
+        
+        
+        
+       {<Text bold align="center">BG Settings</Text>} 
+       
+        <Toggle
+          settingsKey="viewSettingSelect"
+          label="Manually Set BG Settings?"
+          defaultValue="false"
+        />  
+        
+       <TextInput
+          defaultValue="http://127.0.0.1:17580/status.json"
+          settingsKey="settingsSourceURL"
+          label="Click to Enter Settings API URL"
+          disabled={(props.settingsStorage.getItem('viewSettingSelect') === "true")}
+        />
+        <Text>
+          Default is <Link source="http://127.0.0.1:17580/status.json">http://127.0.0.1:17580/status.json</Link>
+          </Text>
+            
+        <TextInput
+          label="High threshold"
+          settingsKey="highThresholdIn"
+          disabled={!(props.settingsStorage.getItem('viewSettingSelect') === "true")}
+        />
+        <TextInput
+        label="Low threshold"
+        settingsKey="lowThresholdIn"
+          disabled={!(props.settingsStorage.getItem('viewSettingSelect') === "true")}
+        />
+        <Select
+          disabled={!(props.settingsStorage.getItem('viewSettingSelect') === "true")}  
+          settingsKey="BGUnitSelect"
+            label="MMOL or MG/DL?"
+            options={[
+             {name:"mmol"},
+             {name:"mgdl"}
+             ]}
+          /> 
       </Section>
+      
       <Section>
          {<Text bold align="center">Alert Settings</Text>}
       <Text>
