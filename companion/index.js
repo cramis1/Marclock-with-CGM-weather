@@ -60,6 +60,50 @@ if(getSettings( 'viewSettingSelect' )) {
     manualHighLow = false;
   }
 
+if (manualHighLow === true){
+  console.log("manual high low: " + manualHighLow )
+     if(getSettings( 'BGUnitSelect' )) {
+        bgDataUnits = getSettings('BGUnitSelect').values[0].name;
+        console.log("bg settings unit: " + bgDataUnits)
+      } else {
+        bgDataUnits = "mmol";
+      }
+    
+     if (bgDataUnits === "mmol") {
+      
+       if(getSettings("highThresholdIn")){
+         let bgHighLeveltemp = getSettings("highThresholdIn").name;  
+         bgHighLevel =  Math.round(bgHighLeveltemp * 18.018);
+         console.log("bg high level: " + bgHighLevel )
+          } else {
+            bgHighLevel = 164
+          }
+       
+       if(getSettings("lowThresholdIn")){
+           let bgLowLeveltemp = getSettings("lowThresholdIn").name;
+         bgLowLevel = Math.round(bgLowLeveltemp * 18.018);
+        console.log("bg low level: " + bgLowLevel )
+          } else {
+           bgLowLevel = 72
+          }
+      
+      }  else{
+    
+        if(getSettings("highThresholdIn")){
+            bgHighLevel = getSettings("highThresholdIn").name
+          } else {
+            bgHighLevel = 164
+          }
+
+          if(getSettings("lowThresholdIn")){
+           bgLowLevel = getSettings("lowThresholdIn").name
+          } else {
+           bgLowLevel = 72
+          }
+
+      } 
+    console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
+  }
 //console.log("dataURL: " + dataUrl,
               //"   settingsURL: " + settingsUrl);
         
@@ -317,13 +361,7 @@ function buildSettings(settings) {
 
 
 function settingsPollManual() {
-  if (bgDataUnits === "mmol") {
-      let bgHighLeveltemp = Math.round(bgHighLevel * 18.018);
-      bgHighLevel = bgHighLeveltemp;
-      
-      let bgLowLeveltemp = Math.round(bgLowLevel * 18.018);
-      bgLowLevel = bgLowLeveltemp;
-   }
+ 
   
   const messageContent = {"settings": {
       "bgDataUnits" : bgDataUnits,
@@ -394,25 +432,47 @@ settingsStorage.onchange = function(evt) {
   }
   
   if (manualHighLow === true){
-  
-    if(getSettings("highThresholdIn")){
-        bgHighLevel = getSettings("highThresholdIn").name
-      } else {
-        bgHighLevel = 164
-      }
-
-      if(getSettings("lowThresholdIn")){
-       bgLowLevel = getSettings("lowThresholdIn").name
-      } else {
-       bgLowLevel = 72
-      }
-      
-        if(getSettings( 'BGUnitSelect' )) {
+  console.log("manual high low: " + manualHighLow )
+     if(getSettings( 'BGUnitSelect' )) {
         bgDataUnits = getSettings('BGUnitSelect').values[0].name;
-        //console.log("bg settings unit: " + bgDataUnits)
+        console.log("bg settings unit: " + bgDataUnits)
       } else {
         bgDataUnits = "mmol";
       }
+    
+     if (bgDataUnits === "mmol") {
+      
+       if(getSettings("highThresholdIn")){
+         let bgHighLeveltemp = getSettings("highThresholdIn").name;  
+         bgHighLevel =  Math.round(bgHighLeveltemp * 18.018);
+         console.log("bg high level: " + bgHighLevel )
+          } else {
+            bgHighLevel = 164
+          }
+       
+       if(getSettings("lowThresholdIn")){
+           let bgLowLeveltemp = getSettings("lowThresholdIn").name;
+         bgLowLevel = Math.round(bgLowLeveltemp * 18.018);
+        console.log("bg low level: " + bgLowLevel )
+          } else {
+           bgLowLevel = 72
+          }
+      
+      }  else{
+    
+        if(getSettings("highThresholdIn")){
+            bgHighLevel = getSettings("highThresholdIn").name
+          } else {
+            bgHighLevel = 164
+          }
+
+          if(getSettings("lowThresholdIn")){
+           bgLowLevel = getSettings("lowThresholdIn").name
+          } else {
+           bgLowLevel = 72
+          }
+
+      } 
     console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
   }
 
