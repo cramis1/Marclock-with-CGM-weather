@@ -14,6 +14,7 @@ var DTS = {"weather": {
       "temperature" : 0,
       "icon" : 0}}
 var BGError = false;
+var timeSelect = false;
 
 //--------------------------
 //    Other Variables
@@ -317,8 +318,11 @@ function buildSettings(settings) {
 
 function settingsPollManual() {
   if (bgDataUnits === "mmol") {
-      bgHighLevel = Math.round(bgHighLevel * 18.018018018018);
-      bgLowLevel = Math.round(bgLowLevel * 18.018018018018);
+      let bgHighLeveltemp = Math.round(bgHighLevel * 18.018);
+      bgHighLevel = bgHighLeveltemp;
+      
+      let bgLowLeveltemp = Math.round(bgLowLevel * 18.018);
+      bgLowLevel = bgLowLeveltemp;
    }
   
   const messageContent = {"settings": {
@@ -412,6 +416,14 @@ settingsStorage.onchange = function(evt) {
     console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
   }
 
+  if(getSettings( 'timeSelect' )) {
+    timeSelect = getSettings('timeSelect');
+    //console.log("manual high low: " + manualHighLow)
+  } else {
+    timeSelect = false;
+  }
+  
+  
 
 settingsPoll();
 setTimeout(queryBGD(), 500);

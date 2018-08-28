@@ -9,6 +9,7 @@ import * as messaging from "messaging";
 import { vibration } from "haptics";
 import Graph from "graph.js"
 import { memory } from "system";
+import { preferences } from "user-settings";
 
 // Update the clock every minute
 clock.granularity = "minutes";
@@ -68,6 +69,7 @@ let Heartratecheck;
 let previousMuteBG;
 let recordedBG;
 let reminderTimer = 0;
+
 
 hrm.onreading = function (){
   lblHR.text = `${hrm.heartRate}`;
@@ -207,6 +209,7 @@ function updateSettings(data) {
       disableAlert = data.settings.disableAlert;
       snoozeLength = data.settings.snoozeLength;
       weatherUnitF = data.settings.weatherUnitF;
+
   
   if (weatherUnitF === "fahrenheit") {
     lblDist.text = Math.round( (((tempRead) * 9) / 5) + 32 ) + "°F";
@@ -586,7 +589,12 @@ clock.ontick = (evt) => {
   //const day = now.getDay();
   const hours = now.getHours();
   const mins = util.zeroPad(now.getMinutes());
-  const displayHours = hours % 12 || 12;
+  var displayHours; 
+  if (preferences.clockDisplay === "24h") {
+    displayHours = hours;
+  } else {
+  displayHours = hours % 12 || 12;
+  }
   const displayMonth = util.getDisplayMonth(month);
   
   
