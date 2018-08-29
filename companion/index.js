@@ -10,6 +10,13 @@ var longtitude = -79.41;
 var initialLocation = true;
 var API_KEY = "8d1816692ae66048d1058d6235a7b3e8";
 var ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?";
+//Yahoo endpoint:
+//https://query.yahooapis.com/v1/public/yql?q=select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='(43.6,-79.4)') and u='c'&format=json
+var searchtext = "select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
+ // return fetch("https://query.yahooapis.com/v1/public/yql?q=" + searchtext + " and u='c'&format=json")
+
+
+
 var DTS = {"weather": {
       "temperature" : 0,
       "icon" : 0}}
@@ -147,13 +154,18 @@ setInterval(getLocation, 900000);
 function queryOW() {
   //console.log("Companion fetching weather");
   //console.log("lat and long: " + latitude + ", " + longtitude);
-  fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY)
+  searchtext = "select item.condition from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
+ fetch("https://query.yahooapis.com/v1/public/yql?q=" + searchtext + " and u='c'&format=json")
+  //fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY)
   .then(function (response) {
       response.json()
       .then(function(data) {
         // We just want the current temperature
-        DTS.weather.temperature = data["main"]["temp"];
-        DTS.weather.icon = data["weather"]["0"]["id"];
+        //DTS.weather.temperature = data["main"]["temp"];
+        //DTS.weather.icon = data["weather"]["0"]["id"];
+        
+       DTS.weather.temperature = data.query.results.channel.item.condition.temp;
+       DTS.weather.icon = data.query.results.channel.item.condition.code;
         
         // Send the weather data to the device
         

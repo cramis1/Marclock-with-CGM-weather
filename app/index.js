@@ -163,27 +163,32 @@ function processWeatherData(data) {
     iconNumber = data.weather.icon;
   }
   
-  if (iconNumber > 800 && iconNumber < 806) {
+  //if (iconNumber > 800 && iconNumber < 806) {
+  if ((iconNumber >= 19 && iconNumber <= 30) || (iconNumber == 44)) {
     icon.href = "icons/cloudy.png";
     //console.log("The icon is cloudy");
     
-  } else if (iconNumber > 599 && iconNumber < 625){
+ // } else if (iconNumber > 599 && iconNumber < 625){
+    } else if ((iconNumber >= 13 && iconNumber <= 18) || (iconNumber == 7) || (iconNumber == 41) || (iconNumber == 42) || (iconNumber == 43) || (iconNumber == 46)){
     icon.href = "icons/snow.png";    
   //  console.log("The icon is snow");
     
     } 
-  else if (iconNumber > 499 && iconNumber < 550){
-    icon.href = "icons/rain.png";
+  //else if (iconNumber > 499 && iconNumber < 550){
+  else if ((iconNumber >= 10 && iconNumber <= 12) || (iconNumber >= 5 && iconNumber <= 6) || (iconNumber == 35) || (iconNumber == 40)){  
+  icon.href = "icons/rain.png";
  //   console.log("The icon is rain");
     
     }
-  else if (iconNumber > 299 && iconNumber < 350){
-    icon.href = "icons/drizzle.png";    
+  //else if (iconNumber > 299 && iconNumber < 350){
+    else if ((iconNumber >= 8 && iconNumber <= 9)  ){  
+  icon.href = "icons/drizzle.png";    
    //console.log("The icon is drizzle");
     
     }
-  else if (iconNumber > 199 && iconNumber < 250){
-    icon.href = "icons/thunder.png";   
+  //else if (iconNumber > 199 && iconNumber < 250){
+    else if ((iconNumber >= 0 && iconNumber <= 4) || (iconNumber >= 37 && iconNumber <= 39) || (iconNumber == 45) || (iconNumber == 47) ){ 
+  icon.href = "icons/thunder.png";   
    // console.log("The icon is thunder");
     
     }
