@@ -118,7 +118,7 @@ function requestData(DataType) {
      // console.log("Sent request to companion.");
   } else {
       console.log("companion - no connection");
-      //setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
+      setTimeout(function(){messaging.peerSocket.send(messageContent);}, 5000);
   }
 }
 
