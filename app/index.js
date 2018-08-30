@@ -118,7 +118,7 @@ function requestData(DataType) {
      // console.log("Sent request to companion.");
   } else {
       console.log("companion - no connection");
-      setTimeout(function(){messaging.peerSocket.send(messageContent);}, 5000);
+      //setTimeout(function(){messaging.peerSocket.send(messageContent);}, 5000);
   }
 }
 
@@ -316,14 +316,14 @@ function processBgs(data) {
      // console.log("currentBG: " + currentBG);
        console.log("points:" + JSON.stringify(points));
       
-      if(isNaN(currentBG) || BGErrorGray1 === true) {
+  if(isNaN(currentBG) || BGErrorGray1 === true) {
         deltaDisplay.text = 'no data';
         setArrowDirection("Even");
         strikeLine.style.display = "inline";
         leftArc.style.fill = "#708090"; 
        
       } 
-      else {
+  else {
         strikeLine.style.display = "none";
         colorSet(currentBG); 
         processOneBg(currentBG);
@@ -360,7 +360,7 @@ function processBgs(data) {
         } 
          
    
-        if((currentBG <= 55) && ((reminderTimer + 500) <= Math.round(Date.now()/1000))) {
+        if((currentBG <= 55) && ((reminderTimer - 500) <= Math.round(Date.now()/1000))) {
                           
                // console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
@@ -380,6 +380,11 @@ function processBgs(data) {
                    } 
            }
         }
+    
+    if( (currentBG >= (prefHighLevel+25) ) && (currentBG <= (prefLowLevel-25) )) {
+      reminderTimer = Math.round(Date.now()/1000);
+    }
+    
   }
       // graph text axis
      // console.log("prefhighlevel: " + prefHighLevel + "preflowlevel: " + prefLowLevel);
@@ -538,6 +543,7 @@ btnRight.onclick = function(evt) {
  // console.log("Snooze");
   myPopup.style.display = "none";
   stopVibration();
+  requestData("Snooze");
   refrshTimers();
 }
 

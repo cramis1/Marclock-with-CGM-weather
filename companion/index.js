@@ -509,6 +509,51 @@ function getSettings(key) {
   }
 }
 
+//----------------------------------------------------------
+//
+// Snooze Messaging
+//
+//----------------------------------------------------------
+
+
+function querySnooze1(){
+  fetch("http://127.0.0.1:17580/sgv.json?tasker=osnooze")
+   .then(function (response) {
+      
+      if (response.status !== 200) {
+          console.log('Did not snooze fetch xdrip. Status Code: ' +
+            response.status);
+           
+          return;
+        }
+    
+        response.json()
+      .then(function(data) {
+        
+       console.log("fetched xdrip snooze: " + JSON.stringify(data));   
+      });
+  });
+}
+
+function querySnooze2(){
+  fetch("http://127.0.0.1:1979/spikesnooze?snoozeTime=" + snoozeLength)
+   .then(function (response) {
+       if (response.status !== 200) {
+          console.log('Did not snooze fetch spike. Status Code: ' +
+            response.status);
+
+          return;
+        }
+    
+        response.json()
+      .then(function(data) {
+        
+       console.log("fetched spike snooze: " + JSON.stringify(data));
+   
+      });
+  });
+}
+
 
 //----------------------------------------------------------
 //
@@ -525,6 +570,16 @@ messaging.peerSocket.onmessage = function(evt) {
   }
   if (evt.data.RequestType === "Weather" ) {
    queryOW();
+  }
+  if (evt.data.RequestType === "Snooze" ) {
+  
+    if (dataUrl.includes("17580")){
+      querySnooze1();
+        }
+    if (dataUrl.includes("1979")){
+      querySnooze2();
+    }
+  
   }
 } 
 }
