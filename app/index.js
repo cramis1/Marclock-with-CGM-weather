@@ -58,7 +58,7 @@ let prefLowLevel = 74;
 let points; 
 let trend;
 let latestDelta = 0;
-let lastPollTime = (Math.round(Date.now()/1000));
+let lastPollTime = Date.now();
 let weatherCount = 7;
 let settingsCount = 4;
 let disableAlert = false;
@@ -623,6 +623,7 @@ clock.ontick = (evt) => {
       clearInterval(mainTimer);
       mainTimer = setInterval(updateBGPollingStatus, 120000);
       updateBGPollingStatus();
+    console.log("refetch from 5-min timeout")
       }
 }
 
