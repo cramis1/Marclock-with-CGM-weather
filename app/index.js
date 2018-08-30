@@ -619,6 +619,10 @@ clock.ontick = (evt) => {
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;
   
-  
+  if ((lastPollTime + 300000) < Date.now() ) {
+      clearInterval(mainTimer);
+      mainTimer = setInterval(updateBGPollingStatus, 120000);
+      updateBGPollingStatus();
+      }
 }
 
