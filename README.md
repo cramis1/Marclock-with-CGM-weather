@@ -25,11 +25,14 @@ Includes:
 
 Note that when current BG reading is low, Current BG will turn red and graph point will turn red. When current BG reading is high, Current BG will turn orange and graph point will turn orange. When there is a missed BG reading, Current BG will have a gray strike-through and graph point will turn gray. A current BG of question marks means a connection with your phone (companion) has not been established, try tapping on the screen to refetch the data from Xdrip.
 
-You can re-fetch BG and weather AT ANY TIME by clicking on the screen.
+BG readings and weather are fetched every 2 minutes. You can also re-fetch BG and weather AT ANY TIME by clicking on the screen.
 
-Units/thresholds are taken from source (e.g., from xdrip).
+Units/thresholds are taken from source (e.g., from xdrip) or as inputted manually in the settings.
 
-'Disable alert' will disable all alerts except very low BG.
+'Disable alert' should disable all alerts except very low.
+
+On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
+Snooze should ALSO snooze alert on xdrip/spike.
 
 **DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!**
 
