@@ -86,14 +86,14 @@ hrm.start();
 //----------------------------------------------------------
 
 var mainTimer; //= setInterval(updateBGPollingStatus, 120000);
-var weatherTimer;
+
 
 
 initialCall();
 
 function updateBGPollingStatus() {
  
-      if (settingsCount === 4){   
+      if (settingsCount === 6){   
           requestData("Settings");
           settingsCount = 0;
       } else {
@@ -101,7 +101,7 @@ function updateBGPollingStatus() {
         }
       
       if (weatherCount === 7){
-        weatherTimer = setTimeout(requestData("Weather"), 30000);
+        requestData("Weather");
         weatherCount = 0;
       } else {
         weatherCount++
@@ -124,7 +124,7 @@ function requestData(DataType) {
 
 function refrshTimers(){
     clearInterval(mainTimer);
-    clearTimeout(weatherTimer);
+    
     weatherCount = 0;
     mainTimer = setInterval(updateBGPollingStatus, 120000);
     requestData("Data");
@@ -134,7 +134,7 @@ function refrshTimers(){
 function initialCall(){
     
   clearInterval(mainTimer);
-    clearTimeout(weatherTimer);
+    
     weatherCount = 0;
     settingsCount = 0;
     setTimeout(requestData("Settings"), 1500);
@@ -619,11 +619,11 @@ clock.ontick = (evt) => {
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;
   
-  if ((lastPollTime + 300000) < Date.now() ) {
+  /*if ((lastPollTime + 300000) < Date.now() ) {
       clearInterval(mainTimer);
       mainTimer = setInterval(updateBGPollingStatus, 120000);
       updateBGPollingStatus();
     console.log("refetch from 5-min timeout")
-      }
+      }*/
 }
 
