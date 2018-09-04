@@ -37,7 +37,7 @@ Units/thresholds are taken from source (e.g., from xdrip) or as inputted manuall
 On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
 Snooze should ALSO snooze alert on xdrip/spike.
 
--A |S| indicates a snooze is ongoing; a |M| indicates a mute is ongoing; a |D| indicates that alerts have been disabled.
+-An |S| indicates a snooze is ongoing; a |M| indicates a mute is ongoing; a |D| indicates that alerts have been disabled.
 
 **DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!**
 
