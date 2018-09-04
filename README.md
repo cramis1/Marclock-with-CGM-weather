@@ -37,6 +37,8 @@ Units/thresholds are taken from source (e.g., from xdrip) or as inputted manuall
 On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
 Snooze should ALSO snooze alert on xdrip/spike.
 
+-A |S| indicates a snooze is ongoing; a |M| indicates a mute is ongoing; a |D| indicates that alerts have been disabled.
+
 **DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!**
 
 This is made and based on the awesome fitbit clockfaces published by **PedanticAvenger (FlashCGM)** and **Rytiggy (Glance)**. As an amateur coder, these repositories were immensly helpful.
