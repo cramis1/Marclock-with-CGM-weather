@@ -555,6 +555,8 @@ btnLeft.onclick = function(evt) {
   previousMuteBG = recordedBG;
   reminderTimer = (Math.round(Date.now()/1000) + 14400);
   myPopup.style.display = "none";
+  muteIcon.style.display = "inline";
+  snoozeIcon.style.display = "none";
   stopVibration();
    refrshTimers();
 }
@@ -571,6 +573,8 @@ btnRight.onclick = function(evt) {
   }
  // console.log("Snooze");
   myPopup.style.display = "none";
+  muteIcon.style.display = "none";
+  snoozeIcon.style.display = "inline";
   stopVibration();
   requestData("Snooze");
   refrshTimers();
