@@ -56,6 +56,8 @@ This is made and based on the awesome fitbit clockfaces published by **PedanticA
     - (Optional) Point the watch face to the following URL (API Endpoint): `http://127.0.0.1:17580/sgv.json`
     - (Optional) Point the settings API URL to: `http://127.0.0.1:17580/status.json`
   - If you are using **NightScout** you can follow [these steps](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku) and then find the JSON endpoints [here](https://github.com/nightscout/cgm-remote-monitor/wiki/API-v1.0.0-beta-Endpoints) - replace "cgmtest" with your personal URL.
+    - For example, your Data API URL should look like: 'http://cgmtest.herokuapp.com/api/v1/entries.json'  - replace "cgmtest" with your personal URL.
+    - For example, your Settings API URL should look like: 'https://cgmtest.herokuapp.com/api/v1/status.json' - replace "cgmtest" with your personal URL.
   - If you are using **Spike**  
     - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
     - Point the watch face to the following URL (API Endpoint): `http://127.0.0.1:1979/sgv.json`
