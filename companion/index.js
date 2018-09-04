@@ -38,17 +38,42 @@ var points = [220,220,220,220,220,220,220,220,220,220,220,220];
 var currentTimestamp = Math.round(new Date().getTime()/1000);
 var lastTimestamp = 0;
 var latestDelta = 0;
-var disableAlert = false;
-var snoozeLength = 15;
-var weatherUnitF = "celsius";
+var disableAlert;
+var snoozeLength;
+var weatherUnitF;
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
 var BGUnitSelect;
 
 //----------------end other variables
+ if(getSettings( 'timeSelect' )) {
+    timeSelect = getSettings('timeSelect');
+    //console.log("manual high low: " + manualHighLow)
+  } else {
+    timeSelect = false;
+  }
+ 
+if(getSettings('disableAlert')) {
+    disableAlert = getSettings('disableAlert');
+    console.log("disableAlert on settings change: " + disableAlert)
+  } else {
+    disableAlert = false;
+  }
+  
+  if(getSettings('snoozeLength')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+    snoozeLength = getSettings('snoozeLength');
+  } else {
+    snoozeLength = 15;
+  }
+  
+  if(getSettings('selection')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+    weatherUnitF = getSettings('selection').values[0].name;
+  } else {
+    weatherUnitF = "celsius";
+  }
 
- if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
+if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
     dataUrl = getSettings('dataSourceURL').name + "?count=12";
   } else {
     dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
@@ -416,9 +441,9 @@ settingsStorage.onchange = function(evt) {
   //console.log("settingsURL on settings change: " + settingsURL);
   
   
-  if(settingsStorage.getItem( disableAlert )) {
-    disableAlert = JSON.parse(settingsStorage.getItem( disableAlert ));
-    //console.log("disableAlert on settings change: " + disableAlert)
+  if(getSettings('disableAlert')) {
+    disableAlert = getSettings('disableAlert');
+    console.log("disableAlert on settings change: " + disableAlert)
   } else {
     disableAlert = false;
   }

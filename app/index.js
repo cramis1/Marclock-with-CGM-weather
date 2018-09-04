@@ -51,6 +51,9 @@ const btnLeft = myPopup.getElementById("btnLeft");
 const btnRight = myPopup.getElementById("btnRight");
 const alertHeader = document.getElementById("alertHeader");
 let iobcob = document.getElementById("iob");
+const disableIcon = document.getElementById("disableIcon");
+const muteIcon = document.getElementById("muteIcon");
+const snoozeIcon = document.getElementById("snoozeIcon");
 
 let prefBgUnits = "mmol";
 let prefHighLevel = 164;
@@ -222,6 +225,11 @@ function updateSettings(data) {
       lblDist.text = Math.round(tempRead) + "°C";
     }
  
+  if (disableAlert === true){
+    disableIcon.style.display = "inline";
+  } else {
+    disableIcon.style.display = "none";
+  }
 
 }
 
@@ -334,11 +342,30 @@ function processBgs(data) {
      // console.log(currentBG + typeof currentBG);
       //   console.log('reminder timer left: ' + (reminderTimer - Math.round(Date.now()/1000)))
   //
-   
+    if (disableAlert === true){
+    disableIcon.style.display = "inline";
+  } else {
+    disableIcon.style.display = "none";
+  }
+    
+    if (reminderTimer >= (Math.round(Date.now()/1000) + (240*60)) ) {    
+        muteIcon.style.display = "inline";
+        snoozeIcon.style.display = "none";
+      } else if (reminderTimer > Math.round(Date.now()/1000)) {
+          muteIcon.style.display = "none";
+          snoozeIcon.style.display = "inline";
+      } else {
+         muteIcon.style.display = "none";
+         snoozeIcon.style.display = "none";     
+                 }
+        
+    
+    console.log((reminderTimer - Math.round(Date.now()/1000)) )
   //alerts
         if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
-          if(!disableAlert) { 
+          if(!disableAlert) {
+            
              if((previousMuteBG - currentBG) > 35){
               //  console.log('BG REALLY HIGH') ;
                     reminderTimer = (Math.round(Date.now()/1000)) - 10;
@@ -360,7 +387,7 @@ function processBgs(data) {
         } 
          
    
-        if((currentBG <= 55) && ((reminderTimer - 500) <= Math.round(Date.now()/1000))) {
+        if((currentBG <= 55) && ((reminderTimer) <= Math.round(Date.now()/1000))) {
                           
                // console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
@@ -535,7 +562,7 @@ btnRight.onclick = function(evt) {
  // console.log("Snooze length" + snoozeInt);
   if ((snoozeInt >= 1) && (snoozeInt <= 240) ){
   reminderTimer = (Math.round(Date.now()/1000) + (snoozeInt*60) );
- // console.log("Snooze for " + snoozeInt);
+ console.log("reminder timer" + (reminderTimer-(Date.now()/1000)) );
   } else {
   reminderTimer = (Math.round(Date.now()/1000) + 900 );
   //console.log("Snooze for 15 - default");
@@ -618,6 +645,9 @@ clock.ontick = (evt) => {
   lblDate.text = `${displayMonth} ${dayofMonth}`;
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;
+  
+  //arrow.style.visibility = "visible";
+  //arrow.style.display = "inline";
   
   /*if ((lastPollTime + 300000) < Date.now() ) {
       clearInterval(mainTimer);

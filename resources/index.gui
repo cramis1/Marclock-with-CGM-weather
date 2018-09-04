@@ -48,6 +48,11 @@
   <text id="minutes" class="status-text" x="3%" y="97%" text-anchor="start" font-size="14" >? mins</text>
   <text id="iob" class="status-text" x="17%" y="97%" text-anchor="start" font-size="14" text-length="12" display="none">-.-i/-c</text>
   
+ <text id="disableIcon" x="1%" y="38%" text-anchor="start" font-size="18"  font-family="Tungsten-Medium" font-weight="bold" display="none" fill="greenyellow">|D|</text>
+  <text id="snoozeIcon" x="1%" y="45%" text-anchor="start" font-size="18"  font-family="Tungsten-Medium"  font-weight="bold" display="none" fill="greenyellow">|S|</text>
+  <text id="muteIcon" x="1%" y="52%" text-anchor="start" font-size="18"  font-family="Tungsten-Medium"  font-weight="bold" display="none" fill="greenyellow">|M|</text>
+  
+  
   <line id="strikeLine" x1="2" y1="83%" x2="100" y2="83%" fill="#708090" stroke-width="6" display="none" /> 
   
   
