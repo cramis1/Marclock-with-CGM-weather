@@ -408,7 +408,7 @@ function processBgs(data) {
            }
         }
     
-    if( (currentBG >= (prefHighLevel+20) ) && (currentBG <= (prefLowLevel-20) )) {
+    if( (currentBG >= (prefLowLevel+20) ) && (currentBG <= (prefHighLevel-20) )) {
       reminderTimer = Math.round(Date.now()/1000);
       muteIcon.style.display = "none";
       snoozeIcon.style.display = "none";
