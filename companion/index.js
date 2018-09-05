@@ -45,9 +45,18 @@ var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
 var BGUnitSelect;
+var snoozeRemove;
 
 //----------------end other variables
- if(getSettings( 'timeSelect' )) {
+if(getSettings( 'snoozeRemove' )) {
+    snoozeRemove = getSettings('snoozeRemove');
+    //console.log("manual high low: " + manualHighLow)
+  } else {
+    snoozeRemove = false;
+  }
+
+
+if(getSettings( 'timeSelect' )) {
     timeSelect = getSettings('timeSelect');
     //console.log("manual high low: " + manualHighLow)
   } else {
@@ -381,7 +390,8 @@ function buildSettings(settings) {
       "bgLowLevel" : bgLowLevel,
       "disableAlert": disableAlert,
       "snoozeLength": snoozeLength,
-      "weatherUnitF": weatherUnitF
+      "weatherUnitF": weatherUnitF,
+      "snoozeRemove": snoozeRemove
     },
   }; // end of messageContent
   console.log(JSON.stringify(messageContent));
@@ -406,7 +416,8 @@ function settingsPollManual() {
       "bgLowLevel" : bgLowLevel,
       "disableAlert": disableAlert,
       "snoozeLength": snoozeLength,
-      "weatherUnitF": weatherUnitF
+      "weatherUnitF": weatherUnitF,
+      "snoozeRemove": snoozeRemove
     },
   }; // end of messageContent
   console.log(JSON.stringify(messageContent));
@@ -424,6 +435,13 @@ function settingsPollManual() {
 
 
 settingsStorage.onchange = function(evt) {
+  
+ if(getSettings( 'snoozeRemove' )) {
+    snoozeRemove = getSettings('snoozeRemove');
+    //console.log("manual high low: " + manualHighLow)
+  } else {
+    snoozeRemove = false;
+  }
   
   if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
     dataUrl = getSettings('dataSourceURL').name + "?count=12";

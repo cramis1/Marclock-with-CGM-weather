@@ -71,6 +71,22 @@ function mySettings(props) {
       />
          <Text> Default is 15 minutes</Text>
      </Section>
+      
+       <Section>
+        <Text>
+          Turn off snooze and mute when BG back in range
+          </Text>
+             
+      <Toggle
+            settingsKey="snoozeRemove"
+            label=" "
+
+          />
+        </Section>
+      
+      
+      
+      
       <Section>
         <Text>
           Disable Alerts (except very low)

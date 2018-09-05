@@ -72,6 +72,7 @@ let Heartratecheck;
 let previousMuteBG;
 let recordedBG;
 let reminderTimer = 0;
+var snoozeRemove = false;
 
 
 hrm.onreading = function (){
@@ -217,6 +218,7 @@ function updateSettings(data) {
       disableAlert = data.settings.disableAlert;
       snoozeLength = data.settings.snoozeLength;
       weatherUnitF = data.settings.weatherUnitF;
+      snoozeRemove = data.settings.snoozeRemove;
 
   
   if (weatherUnitF === "fahrenheit") {
@@ -408,7 +410,7 @@ function processBgs(data) {
            }
         }
     
-    if( (currentBG >= (prefLowLevel+20) ) && (currentBG <= (prefHighLevel-20) )) {
+    if( ( (currentBG >= (prefLowLevel+15) ) && (currentBG <= (prefHighLevel-15) ) ) && (snoozeRemove === true) ) {
       reminderTimer = Math.round(Date.now()/1000);
       muteIcon.style.display = "none";
       snoozeIcon.style.display = "none";
