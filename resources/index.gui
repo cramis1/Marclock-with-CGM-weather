@@ -56,7 +56,7 @@
   <line id="strikeLine" x1="2" y1="83%" x2="100" y2="83%" fill="#708090" stroke-width="6" display="none" /> 
   
   
-  <image id="arrow" href="icons/even.png" visibility="visible" /> <!-- x="34%" y="67%" width="65" height="65" href="icons/even.png" visibility="visible" /> -->
+  
     
  
   
@@ -68,6 +68,8 @@
        <!-- <text id="middle" class="status-text" x="91%" y="65%+50"  text-anchor="start">mid</text> -->     
         <text id="low" class="status-text" x="97%" y="88%"  text-anchor="start">low</text>  
          </svg>
+  
+  <image id="arrow" href="icons/even.png" visibility="visible" /> <!-- x="34%" y="67%" width="65" height="65" href="icons/even.png" visibility="visible" /> -->
   
   <!-- Alert -->
       <svg id="popup" display="none" >

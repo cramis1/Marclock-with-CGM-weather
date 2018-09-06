@@ -55,9 +55,9 @@ const disableIcon = document.getElementById("disableIcon");
 const muteIcon = document.getElementById("muteIcon");
 const snoozeIcon = document.getElementById("snoozeIcon");
 
-let prefBgUnits = "mmol";
-let prefHighLevel = 164;
-let prefLowLevel = 74;
+let prefBgUnits;
+let prefHighLevel;
+let prefLowLevel;
 let points; 
 let trend;
 let latestDelta = 0;
@@ -142,7 +142,7 @@ function initialCall(){
     
     weatherCount = 0;
     settingsCount = 0;
-    setTimeout(requestData("Settings"), 1500);
+    setTimeout(requestData("Settings"), 500);
     setTimeout(requestData("Data"), 4000);
     setTimeout(requestData("Weather"), 8000);
   
@@ -446,6 +446,8 @@ function processBgs(data) {
           myGraph.setYRange(36, 250);
           myGraph.setSize(135, 80);     
           myGraph.update(points);
+          
+          if (prefHighLevel && prefLowLevel) {
           myGraph.setHighLow(prefHighLevel, prefLowLevel);
           if ((80 - (80 * (Math.round( ( (prefHighLevel - 36) / (250 - 36) )*100 )/100))) < 0){
               high.y = 0;
@@ -453,7 +455,9 @@ function processBgs(data) {
                high.y = (80 - (80 * (Math.round( ( (prefHighLevel - 36) / (250 - 36) )*100 )/100)));
             }
           low.y = (80 - (80 * (Math.round( ( (prefLowLevel - 36) / (250 - 36) )*100 )/100)));
-          
+          } else {
+            requestData("Settings");
+          }
 };
 
 function colorSet(currentBG){
@@ -573,7 +577,7 @@ btnLeft.onclick = function(evt) {
   muteIconOn = true;
   stopVibration();
   requestData("Snooze");
-  refrshTimers();
+  //refrshTimers();
 }
 
 btnRight.onclick = function(evt) {
@@ -593,7 +597,7 @@ btnRight.onclick = function(evt) {
   muteIconOn = false;
   stopVibration();
   requestData("Snooze");
-  refrshTimers();
+  //refrshTimers();
 }
 
 //----------------------------------------------------------
