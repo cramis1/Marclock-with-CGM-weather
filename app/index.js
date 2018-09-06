@@ -408,6 +408,7 @@ function processBgs(data) {
       reminderTimer = Math.round(Date.now()/1000);
       muteIcon.style.display = "none";
       snoozeIcon.style.display = "none";
+      muteIconOn = false;
       console.log("Reset snooze/mute")
     } else if ((reminderTimer > Math.round(Date.now()/1000)) && muteIconOn === true) {    
         muteIcon.style.display = "inline";
