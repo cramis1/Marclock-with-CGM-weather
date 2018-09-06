@@ -35,7 +35,7 @@ Units/thresholds are taken from source (e.g., from xdrip) or as inputted manuall
 'Disable alert' should disable all alerts except very low.
 
 On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
-Snooze should ALSO snooze alert on xdrip/spike.
+Snooze and mute should ALSO snooze alert on xdrip/spike.
 
 -An |S| indicates a snooze is ongoing; a |M| indicates a mute is ongoing; a |D| indicates that alerts have been disabled.
 
