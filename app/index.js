@@ -73,6 +73,7 @@ let previousMuteBG;
 let recordedBG;
 let reminderTimer = 0;
 var snoozeRemove = false;
+var muteIconOn = false;
 
 
 hrm.onreading = function (){
@@ -344,22 +345,7 @@ function processBgs(data) {
      // console.log(currentBG + typeof currentBG);
       //   console.log('reminder timer left: ' + (reminderTimer - Math.round(Date.now()/1000)))
   //
-    if (disableAlert === true){
-    disableIcon.style.display = "inline";
-  } else {
-    disableIcon.style.display = "none";
-  }
-    
-    if (reminderTimer >= (Math.round(Date.now()/1000) + (240*60)) ) {    
-        muteIcon.style.display = "inline";
-        snoozeIcon.style.display = "none";
-      } else if (reminderTimer > Math.round(Date.now()/1000)) {
-          muteIcon.style.display = "none";
-          snoozeIcon.style.display = "inline";
-      } else {
-         muteIcon.style.display = "none";
-         snoozeIcon.style.display = "none";     
-                 }
+ 
         
     
     console.log((reminderTimer - Math.round(Date.now()/1000)) )
@@ -410,11 +396,35 @@ function processBgs(data) {
            }
         }
     
-    if( ( (currentBG >= (prefLowLevel+15) ) && (currentBG <= (prefHighLevel-15) ) ) && (snoozeRemove === true) ) {
+    
+    if (disableAlert === true){
+    disableIcon.style.display = "inline";
+  } else {
+    disableIcon.style.display = "none";
+  }
+    
+     
+    if( ( (currentBG < prefHighLevel ) && (currentBG > prefLowLevel ) ) && (snoozeRemove === true) ) {
       reminderTimer = Math.round(Date.now()/1000);
       muteIcon.style.display = "none";
       snoozeIcon.style.display = "none";
-    }
+      console.log("Reset snooze/mute")
+    } else if ((reminderTimer > Math.round(Date.now()/1000)) && muteIconOn === true) {    
+        muteIcon.style.display = "inline";
+        snoozeIcon.style.display = "none";
+        console.log("muteIcon")
+    } else if (reminderTimer > Math.round(Date.now()/1000)) {
+          muteIcon.style.display = "none";
+          snoozeIcon.style.display = "inline";
+           console.log("snoozeIcon")
+    } else {
+         muteIcon.style.display = "none";
+         snoozeIcon.style.display = "none";
+         muteIconOn = false;
+         console.log("noIcon")
+     }
+    
+    
     
   }
       // graph text axis
@@ -559,8 +569,10 @@ btnLeft.onclick = function(evt) {
   myPopup.style.display = "none";
   muteIcon.style.display = "inline";
   snoozeIcon.style.display = "none";
+  muteIconOn = true;
   stopVibration();
-   refrshTimers();
+  requestData("Snooze");
+  refrshTimers();
 }
 
 btnRight.onclick = function(evt) {
@@ -577,6 +589,7 @@ btnRight.onclick = function(evt) {
   myPopup.style.display = "none";
   muteIcon.style.display = "none";
   snoozeIcon.style.display = "inline";
+  muteIconOn = false;
   stopVibration();
   requestData("Snooze");
   refrshTimers();
@@ -654,6 +667,7 @@ clock.ontick = (evt) => {
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;
   
+    
   //arrow.style.visibility = "visible";
   //arrow.style.display = "inline";
   
