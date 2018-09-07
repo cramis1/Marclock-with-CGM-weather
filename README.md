@@ -39,6 +39,8 @@ Snooze and mute should ALSO snooze alert on xdrip/spike.
 
 -An |S| indicates a snooze is ongoing; a |M| indicates a mute is ongoing; a |D| indicates that alerts have been disabled.
 
+-In the settings you can select whether you would like the snooze and mute to clear when BG is back in range.
+
 **DO NOT USE FOR ANY MEDICAL/TREATMENT PURPOSES!**
 
 This is made and based on the awesome fitbit clockfaces published by **PedanticAvenger (FlashCGM)** and **Rytiggy (Glance)**. As an amateur coder, these repositories were immensly helpful.
