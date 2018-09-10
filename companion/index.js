@@ -295,8 +295,25 @@ function buildGraphData(data) {
   }
   lastTimestamp = parseInt(lastTimestamp/1000, 10);
   latestDelta = obj[0].delta;
-  let iob = obj[0].IOB;
-  let cob = obj[0].COB;
+  
+  let iob;
+  let cob;
+  if (obj[0].IOB || obj[0].COB){
+  iob = obj[0].IOB;
+  cob = obj[0].COB;
+  } else if (obj[0].aaps){
+  
+    let stringaaps = obj[0].aaps;
+    let regex = /(\d+\.\d{2})U.+(\d+\.\d{2})U.+(\d+)g/;
+    let match = regex.exec(stringaaps);
+    if (match) {
+    console.log('Matches: ' + match[1] + ', ' + match[2] + ', ' + match[3]);
+    iob = match[2];
+    cob = match[3];
+    }
+    
+  }
+  
   //var flippedPoints = points.reverse();
         lastTimestamp = obj[0].date;
         bgTrend = obj[0].direction;
