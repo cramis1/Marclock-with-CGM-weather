@@ -1,6 +1,6 @@
 
 export function getDisplayMonth(month) {
-  const strMonth =["Jan", "Feb", "Mar", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+  const strMonth =["Jan", "Feb", "Mar", "Apr.", "May", "June", "July", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
   return strMonth[month];
 }
 
