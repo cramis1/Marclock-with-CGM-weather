@@ -303,16 +303,14 @@ function buildGraphData(data) {
   cob = obj[0].COB;
   } else if (obj[0].aaps){
   
-    let stringaaps = obj[0].aaps;
-    let regex = /(\d+\.\d{2})U.+(\d+\.\d{2})U.+(\d+)g/;
-    let match = regex.exec(stringaaps);
-    if (match) {
-    console.log('Matches: ' + match[1] + ', ' + match[2] + ', ' + match[3]);
-    iob = match[2];
-    cob = match[3];
+    var stringaaps = JSON.stringify(obj[0].aaps);
+    var regex = /.+U.+(\d+\.\d{2})U.+(\d+)g/;
+    var match = regex.exec(stringaaps);
+    iob = match[1];
+    cob = match[2];
     }
     
-  }
+  
   
   //var flippedPoints = points.reverse();
         lastTimestamp = obj[0].date;
