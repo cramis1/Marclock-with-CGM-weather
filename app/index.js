@@ -54,6 +54,7 @@ let iobcob = document.getElementById("iob");
 const disableIcon = document.getElementById("disableIcon");
 const muteIcon = document.getElementById("muteIcon");
 const snoozeIcon = document.getElementById("snoozeIcon");
+const arrow = document.getElementById("arrow");
 
 let prefBgUnits;
 let prefHighLevel;
@@ -482,15 +483,20 @@ function colorSet(currentBG){
 }
 
 function setArrowDirection(delta) {
-  let arrow = document.getElementById("arrow");
+  
   let BGWidth = bgDisplay.getBBox().width;
   let BGstart = bgDisplay.x;
   let dWidth = deltaDisplay.getBBox().width;
   let dStart = deltaDisplay.x;
+  let iobcobWidth = iobcob.getBBox().width;
+  let iobcobStart = iobcob.x;
+  
     arrow.style.visibility = "visible";
     arrow.style.display = "inline";
  
-  if ((dWidth + dStart) > (BGstart + BGWidth)){
+  if( ((iobcobWidth + iobcobStart) > (BGstart + BGWidth)) && ((iobcobWidth + iobcobStart) > (dStart + dWidth)) ){
+     arrow.x = iobcobWidth + iobcobStart + 3;
+  } else if ((dWidth + dStart) > (BGstart + BGWidth)){
     arrow.x = dWidth + dStart + 3;
   } else {
   
