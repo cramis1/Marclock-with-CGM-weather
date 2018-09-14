@@ -8,8 +8,8 @@ import { geolocation } from "geolocation";
 var latitude = 43.76;
 var longtitude = -79.41;
 var initialLocation = true;
-var API_KEY = "8d1816692ae66048d1058d6235a7b3e8";
-var ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?";
+//var API_KEY = "8d1816692ae66048d1058d6235a7b3e8";
+//var ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?";
 //Yahoo endpoint:
 //https://query.yahooapis.com/v1/public/yql?q=select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='(43.6,-79.4)') and u='c'&format=json
 var searchtext = "select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
@@ -296,20 +296,37 @@ function buildGraphData(data) {
   lastTimestamp = parseInt(lastTimestamp/1000, 10);
   latestDelta = obj[0].delta;
   
+  //let testiob = '12.36U(0.18|0.18) -1.07 13g'//'1.50U\/h 0.36U(0.18|0.18) -1.07 0g'
   let iob;
   let cob;
   if (obj[0].IOB || obj[0].COB){
   iob = obj[0].IOB;
   cob = obj[0].COB;
-  } else if (obj[0].aaps){
   
-    var stringaaps = JSON.stringify(obj[0].aaps);
-    var regex = /.+U.+(\d+\.\d{2})U.+(\d+)g/;
-    var match = regex.exec(stringaaps);
-    iob = match[1];
-    cob = match[2];
+   } else  if (obj[0].aaps){
+   //https://regex101.com/r/qFDNIG/4   
+   const regex = /\b(\d+\.?\d+)U\(.+\s+(\d+)g/;
+    const str = obj[0].aaps;
+     //const str = `137.90U(0.18|0.18) -1.07 937g`;
+    let m;
+
+    if ((m = regex.exec(str)) !== null) {
+    // The result can be accessed through the `m`-variable.
+    m.forEach((match, groupIndex) => {
+        console.log(`Found match, group ${groupIndex}: ${match}`);
+    });
     }
+
+
+    if (m){
+     iob = m[1];
+     cob = m[2];
+    } 
     
+  } else {
+    iob = 0;
+    cob = 0;
+  }
   
   
   //var flippedPoints = points.reverse();

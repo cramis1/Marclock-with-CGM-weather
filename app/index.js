@@ -299,8 +299,8 @@ function processBgs(data) {
       BGErrorGray1 = data.bgdata.BGerror;
       
       
-      let iob = data.bgdata.iob;
-      let cob = data.bgdata.cob;
+      let iob = parseFloat(data.bgdata.iob);
+      let cob = parseFloat(data.bgdata.cob);
       let iobtemp;
       let cobtemp;
       if ((iob > 0) || (cob > 0)){
