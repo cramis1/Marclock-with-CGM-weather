@@ -22,6 +22,7 @@ Includes:
 - Current delta
 - Trend arrow
 - Time since last pull from Xdrip (Xdrip only pushes data once every 5 mins)
+- Insulin-on-board and Carbs-on-board
 
 -Note that when current BG reading is low, Current BG will turn red, arc will turn red, and graph point will turn red. 
 -When current BG reading is high, Current BG will turn orange, arc will turn orange, and graph point will turn orange. 
