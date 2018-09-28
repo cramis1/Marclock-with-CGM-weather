@@ -75,6 +75,9 @@ let recordedBG;
 let reminderTimer = 0;
 var snoozeRemove = false;
 var muteIconOn = false;
+let veryLowSnooze = false;
+let snoozeOn = false;
+let emergencyInterval;
 
 
 hrm.onreading = function (){
@@ -132,7 +135,7 @@ function refrshTimers(){
     clearInterval(mainTimer);
     
     weatherCount = 0;
-    mainTimer = setInterval(updateBGPollingStatus, 120000);
+    mainTimer = setInterval(updateBGPollingStatus, 150000);
     requestData("Data");
     setTimeout(requestData("Weather"), 15000);
 }
@@ -147,7 +150,7 @@ function initialCall(){
     setTimeout(requestData("Data"), 4000);
     setTimeout(requestData("Weather"), 8000);
   
-    mainTimer = setInterval(updateBGPollingStatus, 120000);
+    mainTimer = setInterval(updateBGPollingStatus, 150000);
 }
 
 //----------------------------------------------------------
@@ -353,7 +356,7 @@ function processBgs(data) {
   //alerts
         if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
-          if(!disableAlert) {
+          if(!disableAlert && snoozeOn===false) {
             
              if((previousMuteBG - currentBG) > 35){
               //  console.log('BG REALLY HIGH') ;
@@ -376,18 +379,21 @@ function processBgs(data) {
         } 
          
    
-        if((currentBG <= 55) && ((reminderTimer) <= Math.round(Date.now()/1000))) {
+        if((currentBG <= 55) && (((reminderTimer) <= Math.round(Date.now()/1000)) || (veryLowSnooze === true)) ) {
                           
                // console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
-                  startAlertProcess("confirmation-max", ((Math.round(mmol(currentBG)*10))/10));
+                    let tempalertstring = "VERY LOW: " + ((Math.round(mmol(currentBG)*10))/10);
+                  startAlertProcess("confirmation-max", tempalertstring);
                    } else {
-                  startAlertProcess("confirmation-max", currentBG);
+                    let tempalertstring = "VERY LOW: " + currentBG;
+                    startAlertProcess("confirmation-max", tempalertstring);
                    } 
-            
+            veryLowSnooze = false;        
+    
         } else if((currentBG <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
            
-            if(!disableAlert) {  
+            if(!disableAlert && snoozeOn===false) {  
                 //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
@@ -410,6 +416,7 @@ function processBgs(data) {
       muteIcon.style.display = "none";
       snoozeIcon.style.display = "none";
       muteIconOn = false;
+      veryLowSnooze = false;
       console.log("Reset snooze/mute")
     } else if ((reminderTimer > Math.round(Date.now()/1000)) && muteIconOn === true) {    
         muteIcon.style.display = "inline";
@@ -423,6 +430,7 @@ function processBgs(data) {
          muteIcon.style.display = "none";
          snoozeIcon.style.display = "none";
          muteIconOn = false;
+      veryLowSnooze = false;
          console.log("noIcon")
      }
     
@@ -542,16 +550,20 @@ function setArrowDirection(delta) {
 //
 //----------------------------------------------------------
 function startAlertProcess(type, message) {
-  showAlert(message);
+  let messageDisplay = message;
+  showAlert(messageDisplay);
   vibration.start(type);
  // console.log('vibration')
-  vibrationInterval = setTimeout(function(){ startAlertProcess(type, message) }, 3000);
+  emergencyInterval = setTimeout(function(){ messageDisplay = "DIABETIC NOT RESPONDING - CALL 911" }, 905000);
+  vibrationInterval = setTimeout(function(){ startAlertProcess(type, messageDisplay) }, 3000);
+  
 }
 
 
 
 function stopVibration() {
   clearTimeout(vibrationInterval);
+  clearTimeout(emergencyInterval);
   vibration.stop();
 }
 //----------------------------------------------------------
@@ -570,7 +582,7 @@ function showAlert(message) {
   //console.log(message); 
   alertHeader.text = message;
   myPopup.style.display = "inline";
- 
+  snoozeOn = true;
 }
 
 btnLeft.onclick = function(evt) {
@@ -583,6 +595,8 @@ btnLeft.onclick = function(evt) {
   muteIconOn = true;
   stopVibration();
   requestData("Snooze");
+  veryLowSnooze = true;
+  snoozeOn = false;
   //refrshTimers();
 }
 
@@ -603,6 +617,8 @@ btnRight.onclick = function(evt) {
   muteIconOn = false;
   stopVibration();
   requestData("Snooze");
+  veryLowSnooze = true;
+  snoozeOn = false;
   //refrshTimers();
 }
 
@@ -678,7 +694,20 @@ clock.ontick = (evt) => {
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;
   
-    
+    const queryMins = (Math.floor(((Date.now()/1000) - (lastPollTime/1000)) /60));
+    minutesSinceQuery.text = queryMins + " mins";    
+      
+        if (queryMins > 999){
+            minutesSinceQuery.text = "N/A";
+        }
+  
+  if (queryMins >= 5){
+    console.log("refetch on 5 min timeout")
+    //clearInterval(mainTimer);
+    //mainTimer = setInterval(updateBGPollingStatus, 120000);
+    updateBGPollingStatus()
+
+  }
   //arrow.style.visibility = "visible";
   //arrow.style.display = "inline";
   
