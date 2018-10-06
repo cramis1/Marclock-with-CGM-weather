@@ -13,16 +13,21 @@
   <image class="SVGobjects" id="weatherIMG" href="icons/sunny.png" /> <!-- x="303" y="32" width="32" height="32" -->  
   <image class="SVGobjects" id="hrIMG" x="2" y="7" width="21" height="21" href="icons/hr.png" fill-opacity="0.8"/>
   
-  
-  <g transform="translate(50%, 50%)">
+  <symbol id="arcID">
+  <g id="arcGroup" transform="translate(50%, 50%)">
   <arc class="SVGobjects" id="leftArc" y="-113" x="-113" width="226" height="226" 
        arc-width="10" start-angle="-90" sweep-angle="180" 
        fill="greenyellow" pointer-events="visible" /> // x348 y250
   <!-- <arc id="rightArc" y="-113" x="-113" width="226" height="226" 
        arc-width="10" start-angle="0" sweep-angle="180" 
        fill="greenyellow" pointer-events="visible" /> -->
-    <animateTransform attributeType="rotate" begin="click" from="0" to="360" dur="0.8" easing="ease-in-out" />
+    <animateTransform id="animateArc" attributeType="rotate" from="0" to="360" dur="0.8" easing="ease-in-out" begin="enable" end="disable" final="restore" repeatDur="5"/>
   </g>
+    </symbol>
+  <svg width="100%" height="100%">
+    <use id="arcUse" href="#arcID" width="100%" height="100%" />
+  </svg>
+  
     
   <text class="SVGobjects" id="date" />
   <text class="SVGobjects" id="battery" />

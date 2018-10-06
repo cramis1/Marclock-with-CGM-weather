@@ -66,6 +66,7 @@ const arrow = document.getElementById("arrow");
 const GraphScreen= document.getElementById("GraphScreen");
 const button1 = document.getElementById("button1");
 const button2 = document.getElementById("button2");
+const animateArc = document.getElementById("arcUse");
 
 
 let prefBgUnits;
@@ -487,6 +488,7 @@ function processBgsPop(data) {
   let pointsPop = data.bgdataPop.sgv;
   let headingNumPop;
           //myGraphPop.setYRange(36, 250);
+  let currentBG = pointsPop[0];
   if(prefBgUnits === 'mmol') {         
         topPop.text = "14"
         //bottomPop.text = "2"
@@ -518,14 +520,17 @@ function processBgsPop(data) {
       }
   
         
-  //highPop.y = tHighPop.y;
-  // lowPop.y = tLowPop.y;
-  // midPop.y = (highPop.y - lowPop.y) / 2;
+
   
   
          GraphScreen.style.display = "inline";
           console.log("Graph screen on")  
-          //graphButtonsOn();
+          animateArc.animate("disable");
+         
+  
+  
+  
+  //Non graph BG functions
       trend = data.bgdataPop.currentTrend;
       lastPollTime = data.bgdataPop.lastPollTime;
       lastPopTime = lastPollTime;
@@ -556,7 +561,7 @@ function processBgsPop(data) {
       } else {
         iobcob.style.display = "none";
       }
-  let currentBG = pointsPop[0];
+  
      // console.log("currentBG: " + currentBG);
        console.log("points:" + JSON.stringify(points));
       
@@ -875,6 +880,7 @@ messaging.peerSocket.onmessage = function(evt) {
 
 button1.onclick = function() {
   console.log("bring up graph");
+  animateArc.animate("enable");
     if ((Date.now() - lastPollTime) < 60000) {
       processBgsPop(popHolder);
     } else {
