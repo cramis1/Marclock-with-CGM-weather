@@ -35,6 +35,7 @@ var bgTargetTop = 0;
 var bgTargetBottom = 0;
 var bgTrend = "Flat";
 var points = [220,220,220,220,220,220,220,220,220,220,220,220];
+var pointsPop = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
 var currentTimestamp = Math.round(new Date().getTime()/1000);
 var lastTimestamp = 0;
 var latestDelta = 0;
@@ -42,6 +43,7 @@ var disableAlert;
 var snoozeLength;
 var weatherUnitF;
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+var dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=40";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
 var BGUnitSelect;
@@ -84,8 +86,10 @@ if(getSettings('disableAlert')) {
 
 if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
     dataUrl = getSettings('dataSourceURL').name + "?count=12";
+    dataUrlPop = getSettings('dataSourceURL').name + "?count=40";
   } else {
     dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+    dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=40";
   }
   
   if(getSettings('settingsSourceURL')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
@@ -264,6 +268,44 @@ function queryBGD () {
   return true;
 };
 
+function queryBGDPop () {
+  console.log("companion queryBGDPop")  
+  //console.log("fetch BG- dataUrl:" + dataUrl)
+  
+  fetch(dataUrlPop,{
+      method: 'GET',
+      mode: 'cors',
+      headers: new Headers({
+        "Content-Type": 'application/json; charset=utf-8'
+      })
+    })
+  .then(response => {
+       response.text().then(data => {
+          console.log('fetched Graph Data from API');
+          //let obj = JSON.parse(data);
+          let returnval = buildGraphDataPop(data);
+          BGError = false;
+        })
+        .catch(responseParsingError => {
+          console.log("Response parsing error in data!");
+          console.log(responseParsingError.name);
+          console.log(responseParsingError.message);
+          console.log(responseParsingError.toString());
+          console.log(responseParsingError.stack);
+          BGError = true;
+        });
+      }).catch(fetchError => {
+        console.log("Fetch Error in data!");
+        console.log(fetchError.name);
+        console.log(fetchError.message);
+        console.log(fetchError.toString());
+        console.log(fetchError.stack);
+        BGError = true;
+})
+  return true;
+};
+
+
 function buildGraphData(data) {
   
   let obj = JSON.parse(data);
@@ -341,6 +383,93 @@ function buildGraphData(data) {
       "iob": iob,
       "cob": cob
     }
+  };
+  console.log(JSON.stringify(messageContent));
+  if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
+    messaging.peerSocket.send(messageContent);
+  } else {
+    console.log("companion - no connection");
+    me.wakeInterval = 2000;
+    setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
+    me.wakeInterval = undefined;
+  }
+  return true;
+}
+
+function buildGraphDataPop(data) {
+  console.log("companion buildGraphDataPop") 
+  let obj = JSON.parse(data);
+  let graphpointindex = 0;
+  var runningTimestamp = new Date().getTime();
+  var indexarray = [];
+
+  let index = 0;
+  let validTimeStamp = false;
+//  console.log(JSON.stringify(obj));
+  for (graphpointindex = 0; graphpointindex < 40; graphpointindex++) {
+    if (index < 40) {
+      while (((runningTimestamp - obj[index].date) >= 305000) && (graphpointindex < 40)) {
+        pointsPop[graphpointindex] = undefined;
+        runningTimestamp = runningTimestamp - 300000;
+        graphpointindex++;
+      }
+      if(graphpointindex < 40) {
+        pointsPop[graphpointindex] = obj[index].sgv;
+       runningTimestamp = obj[index].date;
+      }
+        
+    }
+    index++
+  }
+  latestDelta = obj[0].delta;
+  
+  //let testiob = '12.36U(0.18|0.18) -1.07 13g'//'1.50U\/h 0.36U(0.18|0.18) -1.07 0g'
+  let iob;
+  let cob;
+  if (obj[0].IOB || obj[0].COB){
+  iob = obj[0].IOB;
+  cob = obj[0].COB;
+  
+   } else  if (obj[0].aaps){
+   //https://regex101.com/r/qFDNIG/4   
+   const regex = /\b(\d+\.?\d+)U\(.+\s+(\d+)g/;
+    const str = obj[0].aaps;
+     //const str = `137.90U(0.18|0.18) -1.07 937g`;
+    let m;
+
+    if ((m = regex.exec(str)) !== null) {
+    // The result can be accessed through the `m`-variable.
+    m.forEach((match, groupIndex) => {
+        console.log(`Found match, group ${groupIndex}: ${match}`);
+    });
+    }
+
+
+    if (m){
+     iob = m[1];
+     cob = m[2];
+    } 
+    
+  } else {
+    iob = 0;
+    cob = 0;
+  }
+  
+  
+  //var flippedPoints = points.reverse();
+        lastTimestamp = obj[0].date;
+        bgTrend = obj[0].direction;  
+  
+  
+  const messageContent = {"bgdataPop" : {
+      "sgv": pointsPop, 
+      "lastPollTime": lastTimestamp, 
+      "currentTrend": bgTrend,
+      "delta": latestDelta,
+      "BGerror": BGError,
+      "iob": iob,
+      "cob": cob
+      }
   };
   console.log(JSON.stringify(messageContent));
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
@@ -642,6 +771,10 @@ messaging.peerSocket.onmessage = function(evt) {
   }
   if (evt.data.RequestType === "Data" ) {
    queryBGD();
+  }
+  if (evt.data.RequestType === "DataPop" ) {
+   console.log("companion received DataPop") 
+    queryBGDPop();
   }
   if (evt.data.RequestType === "Weather" ) {
    queryOW();

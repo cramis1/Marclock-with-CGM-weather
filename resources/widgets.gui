@@ -17,5 +17,6 @@
     
     <!-- line below required to import the graph -->
     <link rel="import" href="graph.gui" />
+    <link rel="import" href="graphPop.gui" />
   </defs>
 </svg>

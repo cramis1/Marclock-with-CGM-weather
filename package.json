@@ -22,5 +22,8 @@
         "name": "Marclock CGM & Weather"
       }
     }
+  },
+  "devDependencies": {
+    "@fitbit/sdk": "~1.0.0"
   }
 }
