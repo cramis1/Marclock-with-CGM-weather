@@ -29,7 +29,9 @@ Includes:
 -When there is a missed BG reading, Current BG will have a gray strike-through, arc will turn gray, and graph point will turn gray and be placed in the middle of the graph. 
 -A current BG of question marks means a connection with your phone (companion) has not been established, try tapping on the screen to refetch the data from Xdrip.
 
-BG readings are fetched every 2 minutes. You can also re-fetch BG and weather AT ANY TIME by clicking on the screen.
+You can also bring up a large graph AT ANY TIME by clicking on the screen (may take a second or two to come up due to fetching more BG data points).
+
+BG readings are fetched around every 2 minutes. 
 
 Units/thresholds are taken from source (e.g., from xdrip) or as inputted manually in the settings.
 
