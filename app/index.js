@@ -95,6 +95,7 @@ let emergencyInterval;
 let popHolder;
 let currentBG;
 let currentBGPop;
+let graphTimeout
 
 
 hrm.onreading = function (){
@@ -299,12 +300,7 @@ function processOneBg(data) {
             bgDisplay.text = recordedBG;
         }
       
-        minutesSinceQuery.text = (Math.floor(((Date.now()/1000) - (lastPollTime/1000)) /60)) + " mins";    
-      
-        if ((Math.floor(((Date.now()/1000) - (lastPollTime/1000)) /60)) > 999){
-            minutesSinceQuery.text = "N/A";
-        }
-      
+              
       strikeLine.style.display = "none";  
       
   setArrowDirection(trend);
@@ -361,7 +357,11 @@ function processBgs(data) {
         processOneBg(currentBG);
       
   
-     
+     minutesSinceQuery.text = (Math.floor(((Date.now()/1000) - (lastPollTime/1000)) /60)) + " mins";    
+      
+        if ((Math.floor(((Date.now()/1000) - (lastPollTime/1000)) /60)) > 999){
+            minutesSinceQuery.text = "N/A";
+        }
       
      // console.log(currentBG + typeof currentBG);
       //   console.log('reminder timer left: ' + (reminderTimer - Math.round(Date.now()/1000)))
@@ -501,19 +501,21 @@ function processBgsPop(data) {
         headingNumPop = pointsPop[0];
   }
   
+  if (isNaN(headingNumPop)) {headingNumPop = "BG GRAPH"};
+  
    if (prefHighLevel && prefLowLevel) {
       myGraphPop.setHighLow(prefHighLevel, prefLowLevel);
    } else{
     requestData("Settings");
     }
-  
-          myGraphPop.update(pointsPop, headingNumPop);
+      let tempMidSend = Math.floor((parseInt(prefHighLevel) + parseInt(prefLowLevel)) / 2);
+          myGraphPop.update(pointsPop, headingNumPop, tempMidSend);
           
    if(prefBgUnits === 'mmol') {  
           let tempprefHighLevel =  (Math.round(mmol(prefHighLevel)*10))/10;
           let tempprefLowLevel = (Math.round(mmol(prefLowLevel)*10))/10;  
           highPop.text = tempprefHighLevel;
-          midPop.text = Math.floor((tempprefHighLevel + tempprefLowLevel) *0.5);//Math.floor(ymin + ((ymax-ymin) *0.5));
+          midPop.text = ((tempprefHighLevel + tempprefLowLevel) *0.5).toFixed(1);//Math.floor(ymin + ((ymax-ymin) *0.5));
           lowPop.text = tempprefLowLevel;
       } else {
           highPop.text = prefHighLevel;
@@ -579,7 +581,13 @@ function processBgsPop(data) {
         colorSet(currentBGPop); 
         processOneBg(currentBGPop);
       
-  
+        minutesSinceQuery.text = (Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) + " mins";    
+      
+        if ((Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) > 999){
+            minutesSinceQuery.text = "N/A";
+        } else if ((Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) < 0){
+            minutesSinceQuery.text = "0 mins";       
+        }
      
       
      // console.log(currentBG + typeof currentBG);
@@ -889,11 +897,13 @@ button1.onclick = function() {
    
       processBgsPop(popHolder);
     }
+graphTimeout = setTimeout(function(){ GraphScreen.style.display = "none" }, 60000);
 }
 
 button2.onclick = function () {
   console.log("close graph");
   GraphScreen.style.display = "none"; 
+  clearTimeout(graphTimeout);
 }
 
 

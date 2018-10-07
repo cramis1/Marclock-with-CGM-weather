@@ -26,6 +26,7 @@ export default class GraphPop {
    
    this._tHighLine = this._id.getElementById("tHighPop");
    this._tLowLine = this._id.getElementById("tLowPop");
+   this._tMidLine = this._id.getElementById("tMidPop");
   this._thighNum = this._id.getElementById("highPop");
   this._tlowNum = this._id.getElementById("lowPop");
    this._tmidNum = this._id.getElementById("midPop");
@@ -89,10 +90,11 @@ export default class GraphPop {
  
   
   
-  update(v, headingNum){
+  update(v, headingNum, midNumSend){
     console.log("v0" + v[0])
     this._tHeading.text = "~~~ " + headingNum + " ~~~";
     
+    let midNumHeight = (this._height - (this._height * (Math.round( ( (midNumSend - this._ymin) / (this._ymax - this._ymin) )*100 )/100))) + 25;
     
    this._tHighLine.y1 = (this._height - (this._height * (Math.round( ( (this._tHigh - this._ymin) / (this._ymax - this._ymin) )*100 )/100))) + 25;
    this._tHighLine.y2 = (this._height - (this._height * (Math.round( ( (this._tHigh - this._ymin) / (this._ymax - this._ymin) )*100 )/100))) + 25;
@@ -102,8 +104,10 @@ export default class GraphPop {
    this._thighNum.y = tempHighNum;
    let tempLowNum = (this._height - (this._height * (Math.round( ( (this._tLow - this._ymin) / (this._ymax - this._ymin) )*100 )/100))) + 25;
    this._tlowNum.y = tempLowNum;
-   let tempMidNum = (   (   (    tempHighNum   )  +  (   tempLowNum   ) )    / 2)
+   let tempMidNum = midNumHeight
    this._tmidNum.y = tempMidNum;
+    this._tMidLine.y1 = tempMidNum;
+    this._tMidLine.y2 = tempMidNum;
    this._tHighRect.height = tempHighNum - 25;
    this._tLowRect.y = tempLowNum;
     this._tLowRect.height = this._height - tempLowNum + 25;
