@@ -55,7 +55,7 @@ Units/thresholds are taken from source (e.g., from xdrip) or as inputted manuall
 
 'Disable alert' should disable all alerts except very low.
 
-It will now only alert if the watch is detected as being worn. This will prevent the watch from losing all its batteries for an alert when it is not being worn and a person is there to snooze the alarm.
+It will now only alert if the watch is detected as being worn. This will prevent the watch from losing all its batteries for an alert when it is not being worn and a person is not there to snooze the alarm.
 
 On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
 Snooze and mute should ALSO snooze alert on xdrip/spike.
