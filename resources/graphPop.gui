@@ -6,10 +6,10 @@
       
       <line id="time1" x1="13%" y1="26" x2="13%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
       <line id="time2" x1="25%" y1="26" x2="25%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
-      <line id="time1" x1="37%" y1="26" x2="37%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
-      <line id="time1" x1="49%" y1="26" x2="49%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
-      <line id="time1" x1="61%" y1="26" x2="61%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
-      <line id="time1" x1="73%" y1="26" x2="73%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
+      <line id="time3" x1="37%" y1="26" x2="37%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
+      <line id="time4" x1="49%" y1="26" x2="49%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
+      <line id="time5" x1="61%" y1="26" x2="61%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
+      <line id="time6" x1="73%" y1="26" x2="73%" y2="150%" fill="white" opacity="0.3" stroke-width="1"/>
       
       <rect id="tRectHighPop" x="0" y="26" width="85%" height="15%" fill="#FFA500" opacity="0.2"/> 
       <rect id="tRectLowPop" x="0" y="85%" width="85%" height="15%" fill="red" opacity="0.2"/>
