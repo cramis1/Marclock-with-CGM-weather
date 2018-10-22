@@ -7,10 +7,11 @@ import { battery } from "power";
 import * as util from "../common/utils";
 import * as messaging from "messaging";
 import { vibration } from "haptics";
-import Graph from "graph.js"
-import GraphPop from "graphPop.js"
+import Graph from "./graph.js"
+import GraphPop from "./graphPop.js"
 import { memory } from "system";
 import { preferences } from "user-settings";
+import { BodyPresenceSensor } from "body-presence";
 
 // Update the clock every minute
 clock.granularity = "minutes";
@@ -28,6 +29,9 @@ const lblDate = document.getElementById("date");
 const lblBatt = document.getElementById("battery");
 const time = document.getElementById("time");
 const icon = document.getElementById("weatherIMG");
+const bodyPresenceSensor = new BodyPresenceSensor();
+bodyPresenceSensor.start();
+let bodyPresent = true;
 let iconNumber = 800;
 const hrm = new HeartRateSensor();
 let BGErrorGray1 = false;
@@ -104,6 +108,10 @@ hrm.onreading = function (){
 }
 
 hrm.start();
+
+bodyPresenceSensor.onreading = () => {
+   bodyPresenceSensor.present ? bodyPresent=true : bodyPresent=false;
+}
 
 
 //----------------------------------------------------------
@@ -373,7 +381,7 @@ function processBgs(data) {
   //alerts
         if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
-          if(!disableAlert && snoozeOn===false) {
+          if(!disableAlert && snoozeOn===false && bodyPresent===true) {
             
              if((previousMuteBG - currentBG) > 35){
               //  console.log('BG REALLY HIGH') ;
@@ -410,7 +418,7 @@ function processBgs(data) {
     
         } else if((currentBG <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
            
-            if(!disableAlert && snoozeOn===false) {  
+            if(!disableAlert && snoozeOn===false && bodyPresent===true) {  
                 //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
@@ -501,7 +509,7 @@ function processBgsPop(data) {
         headingNumPop = pointsPop[0];
   }
   
-  if (isNaN(headingNumPop)) {headingNumPop = "BG GRAPH"};
+  if (isNaN(headingNumPop)) {headingNumPop = "BG"};
   
    if (prefHighLevel && prefLowLevel) {
       myGraphPop.setHighLow(prefHighLevel, prefLowLevel);
@@ -529,7 +537,7 @@ function processBgsPop(data) {
   
          GraphScreen.style.display = "inline";
           console.log("Graph screen on")  
-          animateArc.animate("disable");
+          
          
   
   
@@ -600,7 +608,7 @@ function processBgsPop(data) {
   //alerts
         if( (currentBGPop >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
-          if(!disableAlert && snoozeOn===false) {
+          if(!disableAlert && snoozeOn===false && bodyPresent===true) {
             
              if((previousMuteBG - currentBGPop) > 35){
               //  console.log('BG REALLY HIGH') ;
@@ -637,7 +645,7 @@ function processBgsPop(data) {
     
         } else if((currentBGPop <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
            
-            if(!disableAlert && snoozeOn===false) {  
+            if(!disableAlert && snoozeOn===false && bodyPresent===true) {  
                 //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBGPop)*10))/10));
@@ -878,7 +886,9 @@ messaging.peerSocket.onmessage = function(evt) {
     processBgs(evt.data);
   } 
   if (evt.data.hasOwnProperty("bgdataPop")) {
+    
     processBgsPop(evt.data);
+    animateArc.animate("disable");
   } 
   if (evt.data.hasOwnProperty("weather")) {
     processWeatherData(evt.data);

@@ -43,7 +43,7 @@ var disableAlert;
 var snoozeLength;
 var weatherUnitF;
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
-var dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=40";
+var dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
 var BGUnitSelect;
@@ -86,10 +86,10 @@ if(getSettings('disableAlert')) {
 
 if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
     dataUrl = getSettings('dataSourceURL').name + "?count=12";
-    dataUrlPop = getSettings('dataSourceURL').name + "?count=40";
+    dataUrlPop = getSettings('dataSourceURL').name + "?count=41";
   } else {
     dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
-    dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=40";
+    dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   }
   
   if(getSettings('settingsSourceURL')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
@@ -406,14 +406,14 @@ function buildGraphDataPop(data) {
   let index = 0;
   let validTimeStamp = false;
 //  console.log(JSON.stringify(obj));
-  for (graphpointindex = 0; graphpointindex < 40; graphpointindex++) {
-    if (index < 40) {
-      while (((runningTimestamp - obj[index].date) >= 305000) && (graphpointindex < 40)) {
+  for (graphpointindex = 0; graphpointindex < 41; graphpointindex++) {
+    if (index < 41) {
+      while (((runningTimestamp - obj[index].date) >= 305000) && (graphpointindex < 41)) {
         pointsPop[graphpointindex] = undefined;
         runningTimestamp = runningTimestamp - 300000;
         graphpointindex++;
       }
-      if(graphpointindex < 40) {
+      if(graphpointindex < 41) {
         pointsPop[graphpointindex] = obj[index].sgv;
        runningTimestamp = obj[index].date;
       }
