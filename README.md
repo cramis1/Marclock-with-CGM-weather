@@ -15,7 +15,7 @@ Fitbit Clock Face for Versa and Ionic
     - Navigate to `Settings` -> `Inter-App settings` -> `xDrip Web Service` -> `ON` 
   - If you are using **Spike**  
     - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
-  - If you are using **NightScout** you can follow [these steps](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-   heroku). 
+  - If you are using **NightScout** you can follow these instructions: (http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-   heroku). 
     - You will then have a URL address that looks like **https://YOURADDRESS.herokuapp.com**
 
 - Starting on your phone, navigate to the [latest version of Marclock](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9) and click the **Select** button. Then click **install**. 
