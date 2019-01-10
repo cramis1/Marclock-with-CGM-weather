@@ -9,21 +9,27 @@ Fitbit Clock Face for Versa and Ionic
 **If you do not know how to load from the developer menu, please look for this app in the fitbit clock face gallery as "Marclock CGM & Weather". Or click on this link from your phone: [Marclock CGM & Weather](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9)**
 
 # Instructions
+
 - You must have your blood sugars accessible through a URL. (Examples include [xDrip+](https://github.com/jamorham/xDrip-plus), [Nightscout](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku), [Spike](https://spike-app.com/) )
+  - If you are using **xDrip** 
+    - Navigate to `Settings` -> `Inter-App settings` -> `xDrip Web Service` -> `ON` 
+  - If you are using **Spike**  
+    - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
+  - If you are using **NightScout** you can follow [these steps](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-   heroku). 
+    - You will then have a URL address that looks like **https://YOURADDRESS.herokuapp.com**
+
 - Starting on your phone, navigate to the [latest version of Marclock](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9) and click the **Select** button. Then click **install**. 
 - After the installation has finished open the **Fitbit** app and navigate to **clock faces** then click the **green gear** to access **Marclock's settings**.
 - Once in settings:  
-  - If you are using **xDrip** 
-    - Navigate to `Settings` -> `Inter-App settings` -> `xDrip Web Service` -> `ON` 
-    - (Optional) Point the watch face to the following URL (API Endpoint): `http://127.0.0.1:17580/sgv.json`
-    - (Optional) Point the settings API URL to: `http://127.0.0.1:17580/status.json`
-  - If you are using **Spike**  
-    - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
-    - Point the watch face to the following URL (API Endpoint): `http://127.0.0.1:1979/sgv.json`
-    - Point the settings API URL to: `http://127.0.0.1:1979/api/v1/status.json`
-  - If you are using **NightScout** you can follow [these steps](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku) and then find the JSON endpoints [here](https://github.com/nightscout/cgm-remote-monitor/wiki/API-v1.0.0-beta-Endpoints) - replace "cgmtest" with your personal URL.
-    - For example, if using Heroku, your Data API URL should look like: 'https://cgmtest.herokuapp.com/api/v1/entries/sgv.json'  - replace "cgmtest" with your personal URL.
-    - For example, if using Heroku, your Settings API URL should look like: 'https://cgmtest.herokuapp.com/api/v1/status.json' - replace "cgmtest" with your personal URL.
+  - Select your Data Source: either **xDrip** ,  **spike** , or **nightscout**
+    - If you are using **nightscout** - you **must** enter your nightscout address. The address you enter should be something like **https://YOURADDRESS.herokuapp.com** , where 'YOURADDRESS' is replace with your personal site address. **DO NOT include anything after '.com' **
+   - Select whether you would like to manually set the BG settings or have the watchface use the setting from xdrip/spike/nightscout
+   - Select whether you would like to have the watch not provide alerts if you are not wearing the watch.
+   - Select how many minutes you would like to have the watch snooze an alert, when you select snooze for an alert. Note that **Snooze** is for how many minuites you set, while **Mute** is for 4 hours.
+   - Select whether you would like to have the watchface turn off any current Snooze or Mute timers if your BG goes back in range.
+   - Select whether you would like to disable all alerts (except very low)
+   - Select your desired weather unit
+   - **OPTIONAL** Input your own openweather API key
     
 # Features
 This clock face supports Blood Glucose (CGM - continuous glucose monitoring) data from XDrip+, Spike, or Nightscout. 
@@ -41,6 +47,7 @@ Includes:
 - Trend arrow
 - Time since last pull from Xdrip (Xdrip only pushes data once every 5 mins)
 - Insulin-on-board and Carbs-on-board
+- Pop up full size BG graphs
 
 -Note that when current BG reading is low, Current BG will turn red, arc will turn red, and graph point will turn red. 
 -When current BG reading is high, Current BG will turn orange, arc will turn orange, and graph point will turn orange. 
@@ -55,7 +62,7 @@ Units/thresholds are taken from source (e.g., from xdrip) or as inputted manuall
 
 'Disable alert' should disable all alerts except very low.
 
-It will now only alert if the watch is detected as being worn. This will prevent the watch from losing all its batteries for an alert when it is not being worn and a person is not there to snooze the alarm.
+There is now an option to only alert if the watch is detected as being worn. This will prevent the watch from losing all its batteries for an alert when it is not being worn and a person is not there to snooze the alarm.
 
 On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
 Snooze and mute should ALSO snooze alert on xdrip/spike.
