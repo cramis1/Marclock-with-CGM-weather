@@ -30,6 +30,10 @@ Fitbit Clock Face for Versa and Ionic
    - Select whether you would like to disable all alerts (except very low)
    - Select your desired weather unit
    - **OPTIONAL** Input your own openweather API key
+      - Go to https://home.openweathermap.org/users/sign_up
+      - Once signed in, click on the tab labelled "API Keys" - it is six tabs to the left of the LOGOUT button
+      - Copy and paste the 32 character alphanumeric API Key
+      - Paste the API key into the Marcklock settings in the space provided to input your own API key
     
 # Features
 This clock face supports Blood Glucose (CGM - continuous glucose monitoring) data from XDrip+, Spike, or Nightscout. 
