@@ -17,6 +17,7 @@ Fitbit Clock Face for Versa and Ionic
     - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
   - If you are using **NightScout** you can follow these instructions: http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku. 
     - You will then have a URL address that looks like **https://YOURADDRESS.herokuapp.com**
+    - Make sure that it is spelled correctly; for example, http**s**:// vs. http://
 
 - Starting on your phone, navigate to the [latest version of Marclock](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9) and click the **Select** button. Then click **install**. 
 - After the installation has finished open the **Fitbit** app and navigate to **clock faces** then click the **green gear** to access **Marclock's settings**.
