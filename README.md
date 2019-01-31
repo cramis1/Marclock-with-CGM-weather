@@ -17,13 +17,15 @@ Fitbit Clock Face for Versa and Ionic
     - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
   - If you are using **NightScout** you can follow these instructions: http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku. 
     - You will then have a URL address that looks like **https://YOURADDRESS.herokuapp.com**
-    - Make sure that it is spelled correctly; for example, http**s**:// vs. http://
+    
 
 - Starting on your phone, navigate to the [latest version of Marclock](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9) and click the **Select** button. Then click **install**. 
 - After the installation has finished open the **Fitbit** app and navigate to **clock faces** then click the **green gear** to access **Marclock's settings**.
 - Once in settings:  
   - Select your Data Source: either **xDrip** ,  **spike** , or **nightscout**
-    - If you are using **nightscout** - you **must** enter your nightscout address. The address you enter should be something like **https://YOURADDRESS.herokuapp.com** , where 'YOURADDRESS' is replaced with your personal site address. **DO NOT include anything after '.com'**
+    - If you are using **nightscout** - you **must** enter your nightscout address. The address you enter should be something like **https://YOURADDRESS.herokuapp.com** , where 'YOURADDRESS' is replaced with your personal site address. 
+    - **DO NOT include anything after '.com'**
+    - Make sure that it is spelled correctly; for example, http**s**:// vs. http://
    - Select whether you would like to manually set the BG settings or have the watchface use the setting from xdrip/spike/nightscout
    - Select whether you would like to have the watch not provide alerts if you are not wearing the watch.
    - Select how many minutes you would like to have the watch snooze an alert, when you select snooze for an alert. Note that **Snooze** is for how many minuites you set, while **Mute** is for 4 hours.
