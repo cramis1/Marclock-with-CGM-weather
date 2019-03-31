@@ -12,6 +12,12 @@ import GraphPop from "./graphPop.js"
 import { memory } from "system";
 import { preferences } from "user-settings";
 import { BodyPresenceSensor } from "body-presence";
+import { display } from "display";
+import analytics from "fitbit-google-analytics/app"
+
+analytics.configure({
+  tracking_id: "UA-133644530-1"
+})
 
 // Update the clock every minute
 clock.granularity = "minutes";
@@ -29,9 +35,6 @@ const lblDate = document.getElementById("date");
 const lblBatt = document.getElementById("battery");
 const time = document.getElementById("time");
 const icon = document.getElementById("weatherIMG");
-const bodyPresenceSensor = new BodyPresenceSensor();
-bodyPresenceSensor.start();
-let bodyPresent = true;
 let iconNumber = 800;
 const hrm = new HeartRateSensor();
 let BGErrorGray1 = false;
@@ -71,6 +74,7 @@ const GraphScreen= document.getElementById("GraphScreen");
 const button1 = document.getElementById("button1");
 const button2 = document.getElementById("button2");
 const animateArc = document.getElementById("arcUse");
+let tempMins = 0;
 
 
 let prefBgUnits;
@@ -85,13 +89,14 @@ let weatherCount = 7;
 let settingsCount = 4;
 let disableAlert = false;
 let snoozeLength = 15;
-let weatherUnitF = "celsius";
+let weatherUnitF = false;
 let tempRead;
-let Heartratecheck;
+//let Heartratecheck;
 let previousMuteBG;
 let recordedBG;
 let reminderTimer = 0;
 var snoozeRemove = false;
+var signalAlert = false;
 var muteIconOn = false;
 let veryLowSnooze = false;
 let snoozeOn = false;
@@ -99,19 +104,37 @@ let emergencyInterval;
 let popHolder;
 let currentBG;
 let currentBGPop;
-let graphTimeout
-
+let graphTimeout;
+var presenceAlert=false;
+const signalTimeout;
 
 hrm.onreading = function (){
   lblHR.text = `${hrm.heartRate}`;
-  Heartratecheck = hrm.heartRate;
+ // Heartratecheck = hrm.heartRate;
 }
 
 hrm.start();
 
+
+const bodyPresenceSensor = new BodyPresenceSensor();
+bodyPresenceSensor.start();
+let bodyPresent = true;
+let bodyPresentTemp = true;
 bodyPresenceSensor.onreading = () => {
-   bodyPresenceSensor.present ? bodyPresent=true : bodyPresent=false;
-}
+  if (presenceAlert===true){ 
+   bodyPresenceSensor.present ? bodyPresentTemp=true : bodyPresentTemp=false;
+  } else {bodyPresentTemp=true}
+ } 
+
+import { charger } from "power";
+let chargerConnect = false;
+if (presenceAlert===true){
+charger.connected ? chargerConnect=true : chargerConnect=false;
+} else {chargerConnect=false}
+ 
+if (chargerConnect===true || bodyPresentTemp===false ) {bodyPresent=false} else {bodyPresent=true};
+
+
 
 
 //----------------------------------------------------------
@@ -143,9 +166,19 @@ function updateBGPollingStatus() {
       }
    
       requestData("Data");
+
+      console.log('signalAlert: ' + signalAlert + '   !signaltimeout: ' + !signalTimeout)
+  if ((signalAlert === true) && (!signalTimeout)  ) {
+    signalTimeout = setTimeout(noSignal, 1800000);
+    //signalTimeout = setTimeout(noSignal, 10000);
+    console.log('set signal timeout')
+  }
+  
 } 
 
 function requestData(DataType) {
+  
+  
   //console.log("Asking for a data update from companion.");
   var messageContent = {"RequestType" : DataType };
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
@@ -157,14 +190,14 @@ function requestData(DataType) {
   }
 }
 
-function refrshTimers(){
+/*function refrshTimers(){
     clearInterval(mainTimer);
     
     weatherCount = 0;
     mainTimer = setInterval(updateBGPollingStatus, 150000);
     requestData("Data");
     setTimeout(requestData("Weather"), 15000);
-}
+}*/
 
 function initialCall(){
     
@@ -189,7 +222,7 @@ function processWeatherData(data) {
   //console.log("The temperature is: " + Math.round(data.weather.temperature));
   
   if(isNaN(data.weather.temperature)){} else {
-    if (weatherUnitF === "fahrenheit") {
+    if (weatherUnitF === true) {
     lblDist.text = Math.round( (((data.weather.temperature) * 9) / 5) + 32 ) + "°F";
     } else {
       lblDist.text = Math.round(data.weather.temperature) + "°C";
@@ -198,31 +231,31 @@ function processWeatherData(data) {
     iconNumber = data.weather.icon;
   }
   
-  //if (iconNumber > 800 && iconNumber < 806) {
-  if ((iconNumber >= 19 && iconNumber <= 30) || (iconNumber == 44)) {
+  if (iconNumber > 800 && iconNumber < 806) {
+  //if ((iconNumber >= 19 && iconNumber <= 30) || (iconNumber == 44)) {
     icon.href = "icons/cloudy.png";
     //console.log("The icon is cloudy");
     
- // } else if (iconNumber > 599 && iconNumber < 625){
-    } else if ((iconNumber >= 13 && iconNumber <= 18) || (iconNumber == 7) || (iconNumber == 41) || (iconNumber == 42) || (iconNumber == 43) || (iconNumber == 46)){
+ } else if (iconNumber > 599 && iconNumber < 625){
+   // } else if ((iconNumber >= 13 && iconNumber <= 18) || (iconNumber == 7) || (iconNumber == 41) || (iconNumber == 42) || (iconNumber == 43) || (iconNumber == 46)){
     icon.href = "icons/snow.png";    
   //  console.log("The icon is snow");
     
     } 
-  //else if (iconNumber > 499 && iconNumber < 550){
-  else if ((iconNumber >= 10 && iconNumber <= 12) || (iconNumber >= 5 && iconNumber <= 6) || (iconNumber == 35) || (iconNumber == 40)){  
+  else if (iconNumber > 499 && iconNumber < 550){
+  //else if ((iconNumber >= 10 && iconNumber <= 12) || (iconNumber >= 5 && iconNumber <= 6) || (iconNumber == 35) || (iconNumber == 40)){  
   icon.href = "icons/rain.png";
  //   console.log("The icon is rain");
     
     }
-  //else if (iconNumber > 299 && iconNumber < 350){
-    else if ((iconNumber >= 8 && iconNumber <= 9)  ){  
+  else if (iconNumber > 299 && iconNumber < 350){
+    //else if ((iconNumber >= 8 && iconNumber <= 9)  ){  
   icon.href = "icons/drizzle.png";    
    //console.log("The icon is drizzle");
     
     }
-  //else if (iconNumber > 199 && iconNumber < 250){
-    else if ((iconNumber >= 0 && iconNumber <= 4) || (iconNumber >= 37 && iconNumber <= 39) || (iconNumber == 45) || (iconNumber == 47) ){ 
+  else if (iconNumber > 199 && iconNumber < 250){
+    //else if ((iconNumber >= 0 && iconNumber <= 4) || (iconNumber >= 37 && iconNumber <= 39) || (iconNumber == 45) || (iconNumber == 47) ){ 
   icon.href = "icons/thunder.png";   
    // console.log("The icon is thunder");
     
@@ -250,9 +283,11 @@ function updateSettings(data) {
       snoozeLength = data.settings.snoozeLength;
       weatherUnitF = data.settings.weatherUnitF;
       snoozeRemove = data.settings.snoozeRemove;
+      presenceAlert = data.settings.presenceAlert;
+      signalAlert = data.settings.signalAlert;
 
   
-  if (weatherUnitF === "fahrenheit") {
+  if (weatherUnitF === true) {
     lblDist.text = Math.round( (((tempRead) * 9) / 5) + 32 ) + "°F";
     } else {
       lblDist.text = Math.round(tempRead) + "°C";
@@ -364,7 +399,10 @@ function processBgs(data) {
         colorSet(currentBG); 
         processOneBg(currentBG);
       
-  
+        if (signalAlert === true) {
+          clearTimeout(signalTimeout);
+          signalTimeout = null;
+          }
      minutesSinceQuery.text = (Math.floor(((Date.now()/1000) - (lastPollTime/1000)) /60)) + " mins";    
       
         if ((Math.floor(((Date.now()/1000) - (lastPollTime/1000)) /60)) > 999){
@@ -381,12 +419,15 @@ function processBgs(data) {
   //alerts
         if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
-          if(!disableAlert && snoozeOn===false && bodyPresent===true) {
+          display.poke();
+          
+          if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {
             
              if((previousMuteBG - currentBG) > 35){
               //  console.log('BG REALLY HIGH') ;
                     reminderTimer = (Math.round(Date.now()/1000)) - 10;
-                   if(prefBgUnits === 'mmol') {
+               
+               if(prefBgUnits === 'mmol') {
                       startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
                     } else {
                       startAlertProcess("nudge-max", currentBG);
@@ -405,7 +446,9 @@ function processBgs(data) {
          
    
         if((currentBG <= 45) && (((reminderTimer) <= Math.round(Date.now()/1000)) ) ) {
-                          
+                    
+          display.poke();
+          
                // console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
                     let tempalertstring = "VERY LOW: " + ((Math.round(mmol(currentBG)*10))/10);
@@ -418,7 +461,9 @@ function processBgs(data) {
     
         } else if((currentBG <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
            
-            if(!disableAlert && snoozeOn===false && bodyPresent===true) {  
+          display.poke();
+          
+            if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {  
                 //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
@@ -509,7 +554,7 @@ function processBgsPop(data) {
         headingNumPop = pointsPop[0];
   }
   
-  if (isNaN(headingNumPop)) {headingNumPop = "BG"};
+  if (isNaN(headingNumPop)) {headingNumPop = "?"};
   
    if (prefHighLevel && prefLowLevel) {
       myGraphPop.setHighLow(prefHighLevel, prefLowLevel);
@@ -537,7 +582,7 @@ function processBgsPop(data) {
   
          GraphScreen.style.display = "inline";
           console.log("Graph screen on")  
-          
+          display.poke();
          
   
   
@@ -549,7 +594,7 @@ function processBgsPop(data) {
       latestDelta = data.bgdataPop.delta; 
       BGErrorGray1 = data.bgdataPop.BGerror;
       
-      
+
       let iob = parseFloat(data.bgdataPop.iob);
       let cob = parseFloat(data.bgdataPop.cob);
       let iobtemp;
@@ -573,6 +618,7 @@ function processBgsPop(data) {
       } else {
         iobcob.style.display = "none";
       }
+
   
      // console.log("currentBG: " + currentBG);
        console.log("points:" + JSON.stringify(points));
@@ -582,13 +628,18 @@ function processBgsPop(data) {
         setArrowDirection("Even");
         strikeLine.style.display = "inline";
         leftArc.style.fill = "#708090"; 
+        
        
       } 
   else {
+    if (signalAlert === true) {
+      clearTimeout(signalTimeout);
+      signalTimeout = null;
+      }
         strikeLine.style.display = "none";
         colorSet(currentBGPop); 
         processOneBg(currentBGPop);
-      
+        
         minutesSinceQuery.text = (Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) + " mins";    
       
         if ((Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) > 999){
@@ -608,7 +659,9 @@ function processBgsPop(data) {
   //alerts
         if( (currentBGPop >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
-          if(!disableAlert && snoozeOn===false && bodyPresent===true) {
+          display.poke();
+          
+          if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {
             
              if((previousMuteBG - currentBGPop) > 35){
               //  console.log('BG REALLY HIGH') ;
@@ -632,7 +685,9 @@ function processBgsPop(data) {
          
    
         if((currentBGPop <= 45) && (((reminderTimer) <= Math.round(Date.now()/1000)) ) ) {
-                          
+                
+          display.poke();
+          
                // console.log('BG VERY LOW') ;
                   if(prefBgUnits === 'mmol') {
                     let tempalertstring = "VERY LOW: " + ((Math.round(mmol(currentBGPop)*10))/10);
@@ -645,7 +700,9 @@ function processBgsPop(data) {
     
         } else if((currentBGPop <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
            
-            if(!disableAlert && snoozeOn===false && bodyPresent===true) {  
+          display.poke();
+          
+            if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {  
                 //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBGPop)*10))/10));
@@ -738,15 +795,18 @@ function setArrowDirection(delta) {
     arrow.style.visibility = "visible";
     arrow.style.display = "inline";
  
-  if( ((iobcobWidth + iobcobStart) > (BGstart + BGWidth)) && ((iobcobWidth + iobcobStart) > (dStart + dWidth)) ){
-     arrow.x = iobcobWidth + iobcobStart + 3;
-  } else if ((dWidth + dStart) > (BGstart + BGWidth)){
+  //if( ((iobcobWidth + iobcobStart) > (BGstart + BGWidth)) && ((iobcobWidth + iobcobStart) > (dStart + dWidth)) ){
+    // arrow.x = iobcobWidth + iobcobStart + 3;
+  //} else 
+    if ((dWidth + dStart) > (BGstart + BGWidth)){
     arrow.x = dWidth + dStart + 3;
   } else {
   
   arrow.x = BGstart + BGWidth + 3;
   }
-    
+  
+
+  
   if(delta === "FortyFiveUp" ) {
     arrow.href = "icons/up.png";
 
@@ -811,7 +871,25 @@ let myPopup = document.getElementById("popup");
 let btnLeft = myPopup.getElementById("btnLeft");
 let btnRight = myPopup.getElementById("btnRight");
 let alertHeader = document.getElementById("alertHeader");
+let myPopupSignal = document.getElementById("Signalpopup");
+let SignalbtnRight = myPopupSignal.getElementById("SignalbtnRight");
+let alertHeaderSignal = document.getElementById("alertHeaderSignal");
+let SignalvibInt;
 
+function noSignal() {
+  alertHeaderSignal.text = "No Signal";
+  myPopupSignal.style.display = "inline";
+  vibration.start("nudge-max")
+  console.log('no signal ON')
+  SignalvibInt = setTimeout(noSignal, 3000);
+}
+
+SignalbtnRight.onclick = function(evt) {
+  
+  myPopupSignal.style.display = "none";
+  clearTimeout(SignalvibInt);
+  vibration.stop();
+}
 
 function showAlert(message) {
  // console.log('ALERT BG')
@@ -875,14 +953,26 @@ messaging.peerSocket.onopen = function() {
 
 messaging.peerSocket.onerror = function(err) {
   console.log("Connection error: " + err.code + " - " + err.message);
+  
 }
+
 
 messaging.peerSocket.onmessage = function(evt) {
   console.log(JSON.stringify(evt));
+
   if (evt.data.hasOwnProperty("settings")) {
     updateSettings(evt.data)
   } 
+
   if (evt.data.hasOwnProperty("bgdata")) {
+    
+  analytics.send({
+    hit_type: "event",
+    event_category: "Display",
+    event_action: "Blood Glucose Query",
+    event_label: "Blood Glucose Query"
+  })
+
     processBgs(evt.data);
   } 
   if (evt.data.hasOwnProperty("bgdataPop")) {
@@ -945,7 +1035,7 @@ clock.ontick = (evt) => {
   leftArc.startAngle = -105 + (((210) - (2.1 * charge)) / 2);
   leftArc.sweepAngle = (2.1 * charge);
 
-  lblActive.text = (today.local.activeMinutes) + "m";
+  lblActive.text = (today.local.activeMinutes); // + "m";
   lblSteps.text = (today.local.steps);
   
   lblDate.text = `${displayMonth} ${dayofMonth}`;
@@ -959,13 +1049,26 @@ clock.ontick = (evt) => {
             minutesSinceQuery.text = "N/A";
         }
   
-  if (queryMins >= 5){
+  if ((queryMins >= 5)){
     console.log("refetch on 5 min timeout")
     //clearInterval(mainTimer);
     //mainTimer = setInterval(updateBGPollingStatus, 120000);
+   // tempMins = queryMins;
     updateBGPollingStatus()
 
   }
+
  
+    
+  
+  if (presenceAlert===true){
+    charger.connected ? chargerConnect=true : chargerConnect=false;
+    } else {chargerConnect=false}
+
+  if (chargerConnect===true || bodyPresentTemp===false ) {bodyPresent=false} else {bodyPresent=true};
+  
+
+
+  
 }
 

@@ -1,18 +1,57 @@
 import * as messaging from "messaging";
-import { encode } from 'cbor';
+//import { encode } from 'cbor';
 import { settingsStorage } from "settings";
 import { me } from "companion";
 import { geolocation } from "geolocation";
+import "fitbit-google-analytics/companion"
 
 
 var latitude = 43.76;
 var longtitude = -79.41;
 var initialLocation = true;
-//var API_KEY = "8d1816692ae66048d1058d6235a7b3e8";
-//var ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?";
+var randKey = Math.floor((Math.random() * 10) + 1);
+var API_KEY;
+var nDelta;
+var tempURL;
+switch(randKey) {
+  case 1:
+    API_KEY = "8d1816692ae66048d1058d6235a7b3e8";
+    break;
+  case 2:
+    API_KEY = "febb7b22b29883d74014982a3c2f56c1";
+    break;
+  case 3:
+    API_KEY = "36461821ccd46bc9e0cd77253829b169";
+    break;
+  case 4:
+    API_KEY = "fe5f92599d68e21ee8174d5f686719a2";
+    break;
+  case 5:
+    API_KEY = "f16977ffd38c1a4728d7a3c0c8d14b75";
+    break;
+   case 6:
+    API_KEY = "f53c9c7af3dba0d6f9b8d11d195575bd";
+   break;
+  case 7:
+    API_KEY = "3b2ecaa29306a60d35e5f281fc1899bd";
+    break;
+  case 8:
+    API_KEY = "aa3c90f1a13369e46d6a4c706c4c1b33";
+    break;
+  case 9:
+    API_KEY = "d462bb6d9ab472a48bbc85e9462e9f07";
+    break;
+  case 10:
+    API_KEY = "f01217a758763f6d7d139fc6b04a7328";
+    break;
+  default:
+    API_KEY = "8d1816692ae66048d1058d6235a7b3e8";
+}
+console.log("API_KEY " + API_KEY)
+var ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?";
 //Yahoo endpoint:
 //https://query.yahooapis.com/v1/public/yql?q=select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='(43.6,-79.4)') and u='c'&format=json
-var searchtext = "select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
+//var searchtext = "select item from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
  // return fetch("https://query.yahooapis.com/v1/public/yql?q=" + searchtext + " and u='c'&format=json")
 
 
@@ -31,8 +70,8 @@ var timeSelect = false;
 var bgDataUnits = "mg/dl";
 var bgHighLevel = 0;
 var bgLowLevel = 0;
-var bgTargetTop = 0;
-var bgTargetBottom = 0;
+//var bgTargetTop = 0;
+//var bgTargetBottom = 0;
 var bgTrend = "Flat";
 var points = [220,220,220,220,220,220,220,220,220,220,220,220];
 var pointsPop = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
@@ -48,13 +87,36 @@ var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
 var BGUnitSelect;
 var snoozeRemove;
+var signalAlert;
+var dataSource;
+var presenceAlert;
+var NightURL = "";
 
 //----------------end other variables
+if(getSettings( 'openKey' )) {
+    API_KEY = getSettings('openKey');
+    //console.log("manual high low: " + manualHighLow)
+  } 
+
+  if(getSettings( 'signalAlert' )) {
+    signalAlert = getSettings('signalAlert');
+    console.log("signalalert: " + signalAlert)
+  } else {
+    signalAlert = false;
+  }
+
 if(getSettings( 'snoozeRemove' )) {
     snoozeRemove = getSettings('snoozeRemove');
     //console.log("manual high low: " + manualHighLow)
   } else {
     snoozeRemove = false;
+  }
+
+if(getSettings( 'presenceAlert' )) {
+    presenceAlert = getSettings('presenceAlert');
+    //console.log("manual high low: " + manualHighLow)
+  } else {
+    presenceAlert = false;
   }
 
 
@@ -79,25 +141,52 @@ if(getSettings('disableAlert')) {
   }
   
   if(getSettings('selection')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
-    weatherUnitF = getSettings('selection').values[0].name;
+    weatherUnitF = getSettings('selection');
+    console.log("Chnage of unit on settings change: " + weatherUnitF)
   } else {
-    weatherUnitF = "celsius";
+    weatherUnitF = false;
   }
 
-if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
-    dataUrl = getSettings('dataSourceURL').name + "?count=12";
-    dataUrlPop = getSettings('dataSourceURL').name + "?count=41";
-  } else {
-    dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
-    dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
-  }
-  
-  if(getSettings('settingsSourceURL')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+if(getSettings('SourceSelect')){
+dataSource = getSettings('SourceSelect').values[0].name;
+}
+
+if (dataSource === 'xdrip'){
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
+  settingsUrl = "http://127.0.0.1:17580/status.json";
+} else if (dataSource === 'spike'){
+  dataUrl = "http://127.0.0.1:1979/sgv.json?count=12";
+  dataUrlPop = "http://127.0.0.1:1979/sgv.json?count=41";
+  settingsUrl = "http://127.0.0.1:1979/status.json";
+} else if (dataSource === 'nightscout') {
+ 
+  if(getSettings('NightSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
+    NightURL = getSettings('NightSourceURL').name;
+    var lastChar = NightURL.substr(-1);
+      if (lastChar !== '/') {       
+        dataUrl = NightURL + "/api/v1/entries/sgv.json?count=12";
+        dataUrlPop = NightURL + "/api/v1/entries/sgv.json?count=41";
+        settingsUrl = NightURL + "/api/v1/status.json";
+        tempURL = NightURL + "/api/v2/properties";
+      } else{
+        dataUrl = NightURL + "api/v1/entries/sgv.json?count=12";
+        dataUrlPop = NightURL + "api/v1/entries/sgv.json?count=41";
+        settingsUrl = NightURL + "api/v1/status.json";
+        tempURL = NightURL + "/api/v2/properties";
+      }
+  } 
+} else {
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
+  settingsUrl = "http://127.0.0.1:17580/status.json";
+}
+ /* if(getSettings('settingsSourceURL')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
     settingsUrl = getSettings('settingsSourceURL').name;
   } else {
     settingsUrl = "http://127.0.0.1:17580/status.json";
   }
-
+*/
 if(getSettings( 'viewSettingSelect' )) {
     manualHighLow = getSettings('viewSettingSelect');
     //console.log("manual high low: " + manualHighLow)
@@ -192,18 +281,18 @@ setInterval(getLocation, 900000);
 function queryOW() {
   //console.log("Companion fetching weather");
   //console.log("lat and long: " + latitude + ", " + longtitude);
-  searchtext = "select item.condition from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
- fetch("https://query.yahooapis.com/v1/public/yql?q=" + searchtext + " and u='c'&format=json")
-  //fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY)
+  //searchtext = "select item.condition from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
+ //fetch("https://query.yahooapis.com/v1/public/yql?q=" + searchtext + " and u='c'&format=json")
+  fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY)
   .then(function (response) {
       response.json()
       .then(function(data) {
         // We just want the current temperature
-        //DTS.weather.temperature = data["main"]["temp"];
-        //DTS.weather.icon = data["weather"]["0"]["id"];
+        DTS.weather.temperature = data["main"]["temp"];
+        DTS.weather.icon = data["weather"]["0"]["id"];
         
-       DTS.weather.temperature = data.query.results.channel.item.condition.temp;
-       DTS.weather.icon = data.query.results.channel.item.condition.code;
+       //DTS.weather.temperature = data.query.results.channel.item.condition.temp;
+       //DTS.weather.icon = data.query.results.channel.item.condition.code;
         
         // Send the weather data to the device
         
@@ -231,11 +320,10 @@ function queryOW() {
 // Aquire BG
 //
 //----------------------------------------------------------
-function queryBGD () {
+async function fetchBGD () {
   
-  //console.log("fetch BG- dataUrl:" + dataUrl)
-  
-  fetch(dataUrl,{
+  if (dataSource === 'nightscout') {
+    fetch(tempURL,{
       method: 'GET',
       mode: 'cors',
       headers: new Headers({
@@ -244,10 +332,12 @@ function queryBGD () {
     })
   .then(response => {
        response.text().then(data => {
-          //console.log('fetched Data from API');
-          //let obj = JSON.parse(data);
-          let returnval = buildGraphData(data);
+          //console.log('properties ' + JSON.stringify(data));
+          let tobj = JSON.parse(data);
+          nDelta = tobj.delta.mgdl;
           BGError = false;
+          console.log('properties ' + nDelta);
+         // fetchBGD ();
         })
         .catch(responseParsingError => {
           console.log("Response parsing error in data!");
@@ -264,54 +354,141 @@ function queryBGD () {
         console.log(fetchError.toString());
         console.log(fetchError.stack);
         BGError = true;
+  })
+  
+  }
+  //console.log("fetch BG- dataUrl:" + dataUrl)
+  
+//else {
+//fetchBGD (); 
+//}
+  
+
+
+return nDelta;
+};
+
+function queryBGD () {
+  fetch(dataUrl,{
+    method: 'GET',
+    mode: 'cors',
+    headers: new Headers({
+      "Content-Type": 'application/json; charset=utf-8'
+    })
+  })
+.then(response => {
+     response.text().then(data => {
+        //console.log('fetched Data from API');
+        //let obj = JSON.parse(data);
+        let returnval = buildGraphData(data);
+        BGError = false;
+      })
+      .catch(responseParsingError => {
+        console.log("Response parsing error in data!");
+        console.log(responseParsingError.name);
+        console.log(responseParsingError.message);
+        console.log(responseParsingError.toString());
+        console.log(responseParsingError.stack);
+        BGError = true;
+      });
+    }).catch(fetchError => {
+      console.log("Fetch Error in data!");
+      console.log(fetchError.name);
+      console.log(fetchError.message);
+      console.log(fetchError.toString());
+      console.log(fetchError.stack);
+      BGError = true;
 })
-  return true;
+}
+
+async function fetchBGDPop () {
+  console.log("companion queryBGDPop")  
+  //console.log("fetch BG- dataUrl:" + dataUrl)
+  if (dataSource === 'nightscout') {
+    fetch(tempURL,{
+      method: 'GET',
+      mode: 'cors',
+      headers: new Headers({
+        "Content-Type": 'application/json; charset=utf-8'
+      })
+    })
+  .then(response => {
+       response.text().then(data => {
+          //console.log('properties ' + JSON.stringify(data));
+          let tobj = JSON.parse(data);
+          nDelta = tobj.delta.mgdl;
+          BGError = false;
+          console.log('properties ' + nDelta);
+          //fetchBGDPop();
+        })
+        .catch(responseParsingError => {
+          console.log("Response parsing error in data!");
+          console.log(responseParsingError.name);
+          console.log(responseParsingError.message);
+          console.log(responseParsingError.toString());
+          console.log(responseParsingError.stack);
+          BGError = true;
+        });
+      }).catch(fetchError => {
+        console.log("Fetch Error in data!");
+        console.log(fetchError.name);
+        console.log(fetchError.message);
+        console.log(fetchError.toString());
+        console.log(fetchError.stack);
+        BGError = true;
+  })
+  
+  }
+ // else {
+   // fetchBGDPop();
+ // }
+
+
+ return nDelta;
 };
 
 function queryBGDPop () {
-  console.log("companion queryBGDPop")  
-  //console.log("fetch BG- dataUrl:" + dataUrl)
-  
   fetch(dataUrlPop,{
-      method: 'GET',
-      mode: 'cors',
-      headers: new Headers({
-        "Content-Type": 'application/json; charset=utf-8'
-      })
+    method: 'GET',
+    mode: 'cors',
+    headers: new Headers({
+      "Content-Type": 'application/json; charset=utf-8'
     })
-  .then(response => {
-       response.text().then(data => {
-          console.log('fetched Graph Data from API');
-          //let obj = JSON.parse(data);
-          let returnval = buildGraphDataPop(data);
-          BGError = false;
-        })
-        .catch(responseParsingError => {
-          console.log("Response parsing error in data!");
-          console.log(responseParsingError.name);
-          console.log(responseParsingError.message);
-          console.log(responseParsingError.toString());
-          console.log(responseParsingError.stack);
-          BGError = true;
-        });
-      }).catch(fetchError => {
-        console.log("Fetch Error in data!");
-        console.log(fetchError.name);
-        console.log(fetchError.message);
-        console.log(fetchError.toString());
-        console.log(fetchError.stack);
+  })
+.then(response => {
+     response.text().then(data => {
+        console.log('fetched Graph Data from API');
+        //let obj = JSON.parse(data);
+        let returnval = buildGraphDataPop(data);
+        BGError = false;
+      })
+      .catch(responseParsingError => {
+        console.log("Response parsing error in data!");
+        console.log(responseParsingError.name);
+        console.log(responseParsingError.message);
+        console.log(responseParsingError.toString());
+        console.log(responseParsingError.stack);
         BGError = true;
+      });
+    }).catch(fetchError => {
+      console.log("Fetch Error in data!");
+      console.log(fetchError.name);
+      console.log(fetchError.message);
+      console.log(fetchError.toString());
+      console.log(fetchError.stack);
+      BGError = true;
 })
-  return true;
-};
+}
 
 
-function buildGraphData(data) {
+
+
+async function buildGraphData(data) {
   
   let obj = JSON.parse(data);
   let graphpointindex = 0;
   var runningTimestamp = new Date().getTime();
-  var indexarray = [];
+  //var indexarray = [];
 
   let index = 0;
   let validTimeStamp = false;
@@ -336,7 +513,10 @@ function buildGraphData(data) {
     index++
   }
   lastTimestamp = parseInt(lastTimestamp/1000, 10);
-  latestDelta = obj[0].delta;
+  if (dataSource === 'nightscout') {
+    latestDelta = await fetchBGD();
+  } else {
+  latestDelta = obj[0].delta;}
   
   //let testiob = '12.36U(0.18|0.18) -1.07 13g'//'1.50U\/h 0.36U(0.18|0.18) -1.07 0g'
   let iob;
@@ -384,7 +564,7 @@ function buildGraphData(data) {
       "cob": cob
     }
   };
-  console.log(JSON.stringify(messageContent));
+  console.log("message content sent: " + JSON.stringify(messageContent));
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
     messaging.peerSocket.send(messageContent);
   } else {
@@ -396,7 +576,7 @@ function buildGraphData(data) {
   return true;
 }
 
-function buildGraphDataPop(data) {
+async function buildGraphDataPop(data) {
   console.log("companion buildGraphDataPop") 
   let obj = JSON.parse(data);
   let graphpointindex = 0;
@@ -404,7 +584,7 @@ function buildGraphDataPop(data) {
   var indexarray = [];
 
   let index = 0;
-  let validTimeStamp = false;
+  //let validTimeStamp = false;
 //  console.log(JSON.stringify(obj));
   for (graphpointindex = 0; graphpointindex < 41; graphpointindex++) {
     if (index < 41) {
@@ -421,7 +601,10 @@ function buildGraphDataPop(data) {
     }
     index++
   }
-  latestDelta = obj[0].delta;
+  if (dataSource === 'nightscout') { 
+    latestDelta = await fetchBGDPop();
+  } else {
+  latestDelta = obj[0].delta;}
   
   //let testiob = '12.36U(0.18|0.18) -1.07 13g'//'1.50U\/h 0.36U(0.18|0.18) -1.07 0g'
   let iob;
@@ -471,7 +654,7 @@ function buildGraphDataPop(data) {
       "cob": cob
       }
   };
-  console.log(JSON.stringify(messageContent));
+  console.log("message content sent: " + JSON.stringify(messageContent));
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
     messaging.peerSocket.send(messageContent);
   } else {
@@ -552,7 +735,8 @@ function buildSettings(settings) {
       "disableAlert": disableAlert,
       "snoozeLength": snoozeLength,
       "weatherUnitF": weatherUnitF,
-      "snoozeRemove": snoozeRemove
+      "snoozeRemove": snoozeRemove,
+      "signalAlert": signalAlert
     },
   }; // end of messageContent
   console.log(JSON.stringify(messageContent));
@@ -578,7 +762,9 @@ function settingsPollManual() {
       "disableAlert": disableAlert,
       "snoozeLength": snoozeLength,
       "weatherUnitF": weatherUnitF,
-      "snoozeRemove": snoozeRemove
+      "snoozeRemove": snoozeRemove,
+      "presenceAlert": presenceAlert,
+      "signalAlert": signalAlert
     },
   }; // end of messageContent
   console.log(JSON.stringify(messageContent));
@@ -597,27 +783,66 @@ function settingsPollManual() {
 
 settingsStorage.onchange = function(evt) {
   
- if(getSettings( 'snoozeRemove' )) {
+ if(getSettings( 'openKey' )) {
+    API_KEY = getSettings('openKey');
+    //console.log("manual high low: " + manualHighLow)
+  } 
+
+  if(getSettings( 'signalAlert' )) {
+    signalAlert = getSettings('signalAlert');
+    console.log("signalalert: " + signalAlert)
+  } else {
+    signalAlert = false;
+  }
+
+  
+  if(getSettings( 'snoozeRemove' )) {
     snoozeRemove = getSettings('snoozeRemove');
     //console.log("manual high low: " + manualHighLow)
   } else {
     snoozeRemove = false;
   }
   
-  if(getSettings('dataSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
-    dataUrl = getSettings('dataSourceURL').name + "?count=12";
+  if(getSettings( 'presenceAlert' )) {
+    presenceAlert = getSettings('presenceAlert');
+    //console.log("manual high low: " + manualHighLow)
   } else {
-    dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+    presenceAlert = false;
   }
-  //console.log("dataURL on settings change: " + dataURL);
+
   
-  
-  if(getSettings('settingsSourceURL')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
-    settingsUrl = getSettings('settingsSourceURL').name;
-  } else {
-    settingsUrl = "http://127.0.0.1:17580/status.json";
-  }
-  //console.log("settingsURL on settings change: " + settingsURL);
+ if(getSettings('SourceSelect')){
+dataSource = getSettings('SourceSelect').values[0].name;
+}
+
+if (dataSource === 'xdrip'){
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
+  settingsUrl = "http://127.0.0.1:17580/status.json";
+} else if (dataSource === 'spike'){
+  dataUrl = "http://127.0.0.1:1979/sgv.json?count=12";
+  dataUrlPop = "http://127.0.0.1:1979/sgv.json?count=41";
+  settingsUrl = "http://127.0.0.1:1979/status.json";
+} else if (dataSource === 'nightscout') {
+ 
+  if(getSettings('NightSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
+    var NightURL = getSettings('NightSourceURL').name;
+    var lastChar = NightURL.substr(-1);
+      if (lastChar !== '/') {       
+        dataUrl = NightURL + "/api/v1/entries/sgv.json?count=12";
+        dataUrlPop = NightURL + "/api/v1/entries/sgv.json?count=41";
+        settingsUrl = NightURL + "/api/v1/status.json";
+      } else{
+        dataUrl = NightURL + "api/v1/entries/sgv.json?count=12";
+        dataUrlPop = NightURL + "api/v1/entries/sgv.json?count=41";
+        settingsUrl = NightURL + "api/v1/status.json";
+      }
+  } 
+} else {
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
+  settingsUrl = "http://127.0.0.1:17580/status.json";
+}
   
   
   if(getSettings('disableAlert')) {
@@ -633,12 +858,12 @@ settingsStorage.onchange = function(evt) {
     snoozeLength = 15;
   }
   
-  if(getSettings('selection')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
-    weatherUnitF = getSettings('selection').values[0].name;
+ if(getSettings('selection')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
+    weatherUnitF = getSettings('selection');
+    console.log("Chnage of unit: " + weatherUnitF)
   } else {
-    weatherUnitF = "celsius";
+    weatherUnitF = false;
   }
-  //console.log("temp setting: " + weatherUnitF);
   
  if(getSettings( 'viewSettingSelect' )) {
     manualHighLow = getSettings('viewSettingSelect');
@@ -702,7 +927,7 @@ settingsStorage.onchange = function(evt) {
   
 
 settingsPoll();
-setTimeout(queryBGD(), 500);
+//setTimeout(queryBGD(), 500);
 } 
 
 function getSettings(key) {

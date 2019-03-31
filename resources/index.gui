@@ -3,7 +3,7 @@
     gradient-type="bilinear"
     gradient-x1="30" gradient-y1="30"
     gradient-x2="100%-50" gradient-y2="100%-50"
-    gradient-color1="#1dbbbb"
+    gradient-color1="#2d7261"
     gradient-color2="black"
     gradient-color3="black"
     gradient-color4="#1c453b"
@@ -48,10 +48,10 @@
   
   
   <!--Start of BG stuff-->
-  <text class="SVGobjects" id="delta" class="status-text" x="1%" y="71%" text-anchor="start" font-size="18">???</text>
-  <text class="SVGobjects" id="bg" class="h1 status-text" x="1%" y="90%"  text-anchor="start" font-size="60" >??.0</text>
-  <text class="SVGobjects" id="minutes" class="status-text" x="3%" y="97%" text-anchor="start" font-size="14" >? mins</text>
-  <text class="SVGobjects" id="iob" class="status-text" x="17%" y="97%" text-anchor="start" font-size="14" text-length="12" display="none">-.-i/-c</text>
+  <text class="SVGobjects" id="delta" class="status-text" x="1%" y="69%" text-anchor="start" font-size="18">???</text>
+  <text class="SVGobjects" id="bg" class="h1 status-text" x="1%" y="88%"  text-anchor="start" font-size="60" >??.0</text>
+  <text class="SVGobjects" id="minutes" class="status-text" x="3%" y="97%" text-anchor="start" font-size="18" >? mins</text>
+  <text class="SVGobjects" id="iob" class="status-text" x="17%" y="97%" text-anchor="start" font-size="18" text-length="12" display="none">-.-i/-c</text>
   
  <text class="SVGobjects" id="disableIcon" x="1%" y="38%" text-anchor="start" font-size="18"  font-family="Tungsten-Medium" font-weight="bold" display="none" fill="greenyellow">|D|</text>
   <text class="SVGobjects" id="snoozeIcon" x="1%" y="45%" text-anchor="start" font-size="18"  font-family="Tungsten-Medium"  font-weight="bold" display="none" fill="greenyellow">|S|</text>
@@ -123,6 +123,25 @@
         </use>
       </svg>
       
+<!-- 30min Alert -->
+      <svg id="Signalpopup" display="none" >
+        <!-- Black background -->
+        <rect class="full-size" fill="fb-black" />
 
+        <!-- Title and text -->
+        <use href="#mixed-text-center-mid" class="dialog-mixed-text" fill="fb-white" id="alertHeaderSignal">
+          <set href="#top-padding" attributeName="display" to="none" />
+          <set href="#header/text" attributeName="text-buffer"  to="-------------------" />
+          <set href="#header/text" attributeName="fill" to="fb-magenta"/>
+          <set href="#copy/text" attributeName="text-buffer" to="at least 30 mins" />
+          <set href="#bottom-padding" attributeName="display" to="none" />
+        </use>
+
+               <!-- Right button -->
+        <use id="SignalbtnRight" class="dialog-half-button-right" href="#square-button-negative">
+          <set href="#text" attributeName="text-buffer" to="Okay" />
+          <set href="#text" attributeName="text-anchor" to="middle" />
+        </use>
+      </svg>
 
 </svg>

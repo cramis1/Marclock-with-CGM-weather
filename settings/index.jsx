@@ -1,23 +1,35 @@
-function mySettings(props) {
+ function mySettings(props) {
   return (
     <Page>
-      <Section>
-        {<Text bold align="center">Data Source Settings</Text>}
+      <Section title={<Text bold align="center"> Data Source</Text>}> 
         
+        
+        <Select 
+          settingsKey="SourceSelect"
+            label={<Text bold>Click to select Data Source</Text>}
+            options={[
+             {name:'xdrip'},
+             {name:'spike'},
+             {name:'nightscout'}
+             ]}
+          /> 
+        
+      </Section>
+      <Section>
+        <Text align="center"> <Text italic>Only </Text>if using Nightscout:</Text>
+
          <TextInput
-          settingsKey="dataSourceURL"
-          label="Click to Enter Data API URL"
-          defaultValue="http://127.0.0.1:17580/sgv.json"
+          settingsKey="NightSourceURL"
+          label="Enter Nightscout address   (ex. https://YOURADDRESS.herokuapp.com)   - do not include anything after '.com' "
+          defaultValue="http://127.0.0.1:17580/"
           
         />
-        <Text>
-          Default is <Link source="http://127.0.0.1:17580/sgv.json?count=12">http://127.0.0.1:17580/sgv.json</Link>
-          </Text>
+      
+        
+       </Section>
         
         
-        
-        
-       {<Text bold align="center">BG Settings</Text>} 
+       <Section title={<Text bold align="center"> BG Settings</Text>}> 
        
         <Toggle
           settingsKey="viewSettingSelect"
@@ -25,15 +37,6 @@ function mySettings(props) {
           defaultValue="false"
         />  
         
-       <TextInput
-          defaultValue="http://127.0.0.1:17580/status.json"
-          settingsKey="settingsSourceURL"
-          label="Click to Enter Settings API URL"
-          disabled={(props.settingsStorage.getItem('viewSettingSelect') === "true")}
-        />
-        <Text>
-          Default is <Link source="http://127.0.0.1:17580/status.json">http://127.0.0.1:17580/status.json</Link>
-          </Text>
             
         <TextInput
           label="High threshold"
@@ -56,9 +59,25 @@ function mySettings(props) {
           /> 
       </Section>
       
-      <Section>
-         {<Text bold align="center">Alert Settings</Text>}
-      <Text>
+      <Section title={<Text bold align="center">Alert Settings</Text>}>
+        
+        <Text>
+          Turn off alerts if watch is not being worn:
+          </Text>
+        <Toggle
+            settingsKey="presenceAlert"
+            label=" "
+          />
+{/* 
+        <Text>
+          Raise alert if watch does not receive data for 30 minutes:
+          </Text>
+        <Toggle
+            settingsKey="signalAlert"
+            label=" "
+          />
+      */}
+        <Text>
           Alert Snooze time - {props.settingsStorage.getItem('blah')} MINUTES
           </Text>
         <Slider
@@ -70,48 +89,54 @@ function mySettings(props) {
           onChange={value => props.settingsStorage.setItem('blah', value)} 
       />
          <Text> Default is 15 minutes</Text>
-     </Section>
+     
+       
+      </Section>
       
-       <Section>
-        <Text>
-          Turn off snooze and mute when BG back in range
+       <Section title={<Text bold align="center">Snooze Settings</Text>}>
+                     
+      <Text>
+          Turn off snooze and mute when BG is back in range:
           </Text>
-             
-      <Toggle
+         <Toggle
             settingsKey="snoozeRemove"
+            label=" "
+          />
+         
+             
+        </Section>
+      
+      
+      
+      
+      <Section title={<Text bold align="center">Disable Alert</Text>}>
+    
+           <Text>
+          Disable Alerts (except very low):
+          </Text>  
+      <Toggle
+            settingsKey="disableAlert"
             label=" "
 
           />
         </Section>
-      
-      
-      
-      
-      <Section>
-        <Text>
-          Disable Alerts (except very low)
-          </Text>
+       <Section title={<Text bold align="center">Weather Unit</Text>}>
+       
              
       <Toggle
-            settingsKey="disableAlert"
-            label="Disable Alerts"
-
-          />
-        </Section>
-       <Section>
-        <Text>
-          Weather Unit
-         </Text>
-             
-      <Select
             settingsKey="selection"
-            label="Select"
-            options={[
-             {name:"celsius"},
-             {name:"fahrenheit"}
-             ]}
-          />
+            label="Celsius <--> Fahrenheit"
+            />
         </Section>
+      
+      <Section title={<Text bold align="center">Weather API Key</Text>}>
+        
+        
+         <TextInput
+          label="OpenWeather API Key (Optional)"
+           settingsKey="openKey"
+        />
+      </Section>
     </Page>  
   );
 }

@@ -3,7 +3,7 @@
 }
 
 #active{
-  font-size: 17;
+  font-size: 18;
   font-family: System-Bold;
   text-length: 12;
   text-anchor: start;
@@ -22,9 +22,9 @@
 
 #arrow{
   x: 32%; 
-  y: 63%; 
-  width: 34; 
-  height: 34; 
+  y: 61%; 
+  width: 45; 
+  height: 45; 
 }
 
 .graphset {
@@ -52,7 +52,7 @@
 }
 
 #steps{
-  font-size: 17;
+  font-size: 20;
   font-family: System-Bold;
   text-length: 9;
   text-anchor: start;

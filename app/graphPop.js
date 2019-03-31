@@ -92,7 +92,7 @@ export default class GraphPop {
   
   update(v, headingNum, midNumSend){
     console.log("v0" + v[0])
-    this._tHeading.text = "~~~ " + headingNum + " ~~~";
+    this._tHeading.text = "~ " + headingNum + " ~";
     
     let midNumHeight = (this._height - (this._height * (Math.round( ( (midNumSend - this._ymin) / (this._ymax - this._ymin) )*100 )/100))) + 25;
     

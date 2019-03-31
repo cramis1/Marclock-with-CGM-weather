@@ -23,7 +23,18 @@
       }
     }
   },
-  "devDependencies": {
-    "@fitbit/sdk": "~2.0.0"
+  
+
+"devDependencies": {
+  "@fitbit/sdk": "~1.0.0",
+  "@fitbit/sdk-cli": "^1.0.0"
+},
+
+
+  "dependencies": {
+    "fitbit-google-analytics": "^1.2.0"
+  },
+  "scripts": {
+    "build": "fitbit-build"
   }
 }

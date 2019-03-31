@@ -3,12 +3,12 @@
 }
 
 #active{
-  font-size: 17;
+  font-size: 20;
   font-family: System-Bold;
   text-length: 12;
   text-anchor: start;
   x: 20;
-  y: 75;
+  y: 80;
   fill: #E6E6FA;
   
 }
@@ -46,18 +46,18 @@
 
 #arrow{
   x: 34%; 
-  y: 67%; 
+  y: 65%; 
   width: 62; 
   height: 62; 
 }
 
 #steps{
-  font-size: 17;
+  font-size: 20;
   font-family: System-Bold;
   text-length: 9;
   text-anchor: start;
   x: 20;
-  y: 50;
+  y: 54;
   fill: #E6E6FA;
 }
 
