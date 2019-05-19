@@ -91,7 +91,8 @@ let disableAlert = false;
 let snoozeLength = 15;
 let weatherUnitF = false;
 let tempRead;
-//let Heartratecheck;
+let heartRate;
+let stepCount;
 let previousMuteBG;
 let recordedBG;
 let reminderTimer = 0;
@@ -109,8 +110,8 @@ var presenceAlert=false;
 const signalTimeout;
 
 hrm.onreading = function (){
-  lblHR.text = `${hrm.heartRate}`;
- // Heartratecheck = hrm.heartRate;
+  heartRate = hrm.heartRate;
+  lblHR.text = `${heartRate}`;
 }
 
 hrm.start();
@@ -180,7 +181,9 @@ function requestData(DataType) {
   
   
   //console.log("Asking for a data update from companion.");
-  var messageContent = {"RequestType" : DataType };
+  var messageContent = {"RequestType" : DataType,
+                        "Steps"       : stepCount,
+                        "HeartRate"   : heartRate };
   if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
       messaging.peerSocket.send(messageContent);
      // console.log("Sent request to companion.");
@@ -1036,8 +1039,9 @@ clock.ontick = (evt) => {
   leftArc.sweepAngle = (2.1 * charge);
 
   lblActive.text = (today.local.activeMinutes); // + "m";
-  lblSteps.text = (today.local.steps);
-  
+  stepCount = today.local.steps;
+  lblSteps.text = (stepCount);
+
   lblDate.text = `${displayMonth} ${dayofMonth}`;
   lblBatt.text = `${charge}%`;
   time.text = `${displayHours}:${mins}`;

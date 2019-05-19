@@ -368,8 +368,19 @@ async function fetchBGD () {
 return nDelta;
 };
 
-function queryBGD () {
-  fetch(dataUrl,{
+function queryBGD (stepCount, heartRate) {
+  var dataUrlExtended = dataUrl;
+  if (dataSource === 'xdrip')
+  {
+   if (stepCount > 0) {
+    dataUrlExtended += '&steps=' + stepCount;
+   }
+   if (heartRate > 0) {
+    dataUrlExtended += '&heart=' + heartRate;
+   }
+  }
+  console.log("API call: " + dataUrlExtended);
+  fetch(dataUrlExtended,{
     method: 'GET',
     mode: 'cors',
     headers: new Headers({
@@ -995,7 +1006,12 @@ messaging.peerSocket.onmessage = function(evt) {
      settingsPoll();
   }
   if (evt.data.RequestType === "Data" ) {
-   queryBGD();
+   if (evt.data.hasOwnProperty("Steps") &&
+       evt.data.hasOwnProperty("HeartRate")) {
+    queryBGD(evt.data.Steps, evt.data.HeartRate)
+   } else {
+    queryBGD(0, 0);
+   }
   }
   if (evt.data.RequestType === "DataPop" ) {
    console.log("companion received DataPop") 
