@@ -91,7 +91,7 @@ export default class GraphPop {
   
   
   update(v, headingNum, midNumSend){
-    console.log("v0" + v[0])
+    //console.log("v0" + v[0])
     this._tHeading.text = "~ " + headingNum + " ~";
     
     let midNumHeight = (this._height - (this._height * (Math.round( ( (midNumSend - this._ymin) / (this._ymax - this._ymin) )*100 )/100))) + 25;
@@ -113,7 +113,7 @@ export default class GraphPop {
     this._tLowRect.height = this._height - tempLowNum + 25;
     
     
-    var flippedv = v.reverse(); 
+    var flippedv = v.slice().reverse(); 
     //console.log('flippedv: ' + flippedv)
     //var flippedv = v;
   console.log("Updating Graph:" + JSON.stringify(flippedv) + " into this many graph points:" + this._vals.length + " into length:" + flippedv.length);
@@ -123,7 +123,7 @@ export default class GraphPop {
    
    //for (var index = 0; index < this._vals.length; index++) {
     for (var index = 0; index < 41; index++) {
-    console.log('flippedvPop:' + index + ': ' + flippedv[index])
+   // console.log('flippedvPop:' + index + ': ' + flippedv[index])
      
      //console.log("SGV" + index + ": " + flippedv[index]);
      //this._vals[index].cx = this._width - ((v[index].date-this._xmin) / this._xscale);

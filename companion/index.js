@@ -111,7 +111,7 @@ var NightURL = "";
 //----------------end other variables
 if(getSettings( 'openKey' )) {
     API_KEY = getSettings('openKey');
-    //console.log("manual high low: " + manualHighLow)
+    console.log("manual high low: " + manualHighLow)
   } 
 
   if(getSettings( 'signalAlert' )) {
@@ -211,10 +211,10 @@ if(getSettings( 'viewSettingSelect' )) {
   }
 
 if (manualHighLow === true){
-  console.log("manual high low: " + manualHighLow )
+ //onsole.log("manual high low: " + manualHighLow )
      if(getSettings( 'BGUnitSelect' )) {
         bgDataUnits = getSettings('BGUnitSelect').values[0].name;
-        console.log("bg settings unit: " + bgDataUnits)
+        //console.log("bg settings unit: " + bgDataUnits)
       } else {
         bgDataUnits = "mmol";
       }
@@ -232,7 +232,7 @@ if (manualHighLow === true){
        if(getSettings("lowThresholdIn")){
            let bgLowLeveltemp = getSettings("lowThresholdIn").name;
          bgLowLevel = Math.round(bgLowLeveltemp * 18.018);
-        console.log("bg low level: " + bgLowLevel )
+       // console.log("bg low level: " + bgLowLevel )
           } else {
            bgLowLevel = 72
           }
@@ -252,7 +252,7 @@ if (manualHighLow === true){
           }
 
       } 
-    console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
+   // console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
   }
 //console.log("dataURL: " + dataUrl,
               //"   settingsURL: " + settingsUrl);
@@ -282,7 +282,7 @@ function getLocation (){
     }
 
     function locationError(error) {
-      console.log("Error: " + error.code,
+     console.log("Error: " + error.code,
               "Message: " + error.message);
         }
 }
@@ -320,13 +320,14 @@ async function fetchURLs() {
   } catch (error) {
     console.log(error);
   }
+  console.log("Data: " + JSON.stringify(DTS));
   asap.send(DTS);
 }
 
 
 async function fetchURLsMan() {
   try {
-    // Promise.all() lets us coalesce multiple promises into a single super-promise
+    
     var [BGDdata, Weatherdata] = await Promise.all([
    
       fetch(dataUrl).then((response) => response.text()).catch(error => console.log(error.message)),
@@ -336,14 +337,15 @@ async function fetchURLsMan() {
         DTS.weather.temperature = Weatherdata["main"]["temp"];
         DTS.weather.icon = Weatherdata["weather"]["0"]["id"];
 
-        console.log("BGdata: " + JSON.stringify(BGDdata));
+       // console.log("BGdata: " + JSON.stringify(BGDdata));
         buildGraphData(BGDdata);
         
-        buildSettings(Settingsdata);
+        //buildSettings(Settingsdata);
 
   } catch (error) {
     console.log(error);
   }
+  console.log("Data: " + JSON.stringify(DTS));
   asap.send(DTS);
 }
 
@@ -369,7 +371,7 @@ function fetchBGD () {
           nDelta = tobj.delta.mgdl;
           BGError = false;
           console.log('properties ' + nDelta);
-         // fetchBGD ();
+         
         })
         .catch(responseParsingError => {
           console.log("Response parsing error in data!");
@@ -453,7 +455,7 @@ function buildGraphData(data) {
     if ((m = regex.exec(str)) !== null) {
     // The result can be accessed through the `m`-variable.
     m.forEach((match, groupIndex) => {
-        console.log(`Found match, group ${groupIndex}: ${match}`);
+       // console.log(`Found match, group ${groupIndex}: ${match}`);
     });
     }
 
@@ -603,7 +605,7 @@ if (dataSource === 'xdrip'){
   
   if(getSettings('disableAlert')) {
     disableAlert = getSettings('disableAlert');
-    console.log("disableAlert on settings change: " + disableAlert)
+   // console.log("disableAlert on settings change: " + disableAlert)
   } else {
     disableAlert = false;
   }
@@ -616,7 +618,7 @@ if (dataSource === 'xdrip'){
   
  if(getSettings('selection')){ //&& (getSettings('settingsSourceURL').name.includes('http'))) {
     weatherUnitF = getSettings('selection');
-    console.log("Chnage of unit: " + weatherUnitF)
+    //console.log("Chnage of unit: " + weatherUnitF)
   } else {
     weatherUnitF = false;
   }
@@ -629,10 +631,10 @@ if (dataSource === 'xdrip'){
   }
   
   if (manualHighLow === true){
-  console.log("manual high low: " + manualHighLow )
+  //console.log("manual high low: " + manualHighLow )
      if(getSettings( 'BGUnitSelect' )) {
         bgDataUnits = getSettings('BGUnitSelect').values[0].name;
-        console.log("bg settings unit: " + bgDataUnits)
+        //console.log("bg settings unit: " + bgDataUnits)
       } else {
         bgDataUnits = "mmol";
       }
@@ -642,7 +644,7 @@ if (dataSource === 'xdrip'){
        if(getSettings("highThresholdIn")){
          let bgHighLeveltemp = getSettings("highThresholdIn").name;  
          bgHighLevel =  Math.round(bgHighLeveltemp * 18.018);
-         console.log("bg high level: " + bgHighLevel )
+        // console.log("bg high level: " + bgHighLevel )
           } else {
             bgHighLevel = 164
           }
@@ -650,7 +652,7 @@ if (dataSource === 'xdrip'){
        if(getSettings("lowThresholdIn")){
            let bgLowLeveltemp = getSettings("lowThresholdIn").name;
          bgLowLevel = Math.round(bgLowLeveltemp * 18.018);
-        console.log("bg low level: " + bgLowLevel )
+       // console.log("bg low level: " + bgLowLevel )
           } else {
            bgLowLevel = 72
           }
@@ -670,7 +672,7 @@ if (dataSource === 'xdrip'){
           }
 
       } 
-    console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
+    //console.log("manual high: " + bgHighLevel + " low:" + bgLowLevel + " unit:" + bgDataUnits)
   }
 
   if(getSettings( 'timeSelect' )) {

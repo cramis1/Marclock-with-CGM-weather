@@ -109,7 +109,7 @@ let currentBGPop;
 let graphTimeout;
 var presenceAlert=false;
 const signalTimeout;
-var incomingHolder = {};
+var incomingHolder = [];
 
 hrm.onreading = function (){
   lblHR.text = `${hrm.heartRate}`;
@@ -157,11 +157,11 @@ function updateBGPollingStatus() {
    
       requestData("Data");
 //if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true))
-      console.log('signalAlert: ' + signalAlert + '   !signaltimeout: ' + !signalTimeout)
+     // console.log('signalAlert: ' + signalAlert + '   !signaltimeout: ' + !signalTimeout)
   if ((signalAlert === true) && (!signalTimeout) && (!disableAlert) && (!(charger.connected===true)) ) {
     signalTimeout = setTimeout(noSignal, 1800000);
     //signalTimeout = setTimeout(noSignal, 10000);
-    console.log('set signal timeout')
+    //console.log('set signal timeout')
   }
   
 } 
@@ -171,7 +171,7 @@ function requestData(DataType) {
   
   //console.log("Asking for a data update from companion.");
   var messageContent = {"RequestType" : DataType };
-  console.log("Request data:" + JSON.stringify(messageContent));
+ // console.log("Request data:" + JSON.stringify(messageContent));
   asap.send(messageContent);
 
 }
@@ -249,7 +249,7 @@ function processWeatherData(data) {
 //----------------------------------------------------------
 
 function updateSettings(data) {
-      console.log("Whatsettings:" + JSON.stringify(data));
+     // console.log("Whatsettings:" + JSON.stringify(data));
       prefBgUnits = data.settings.bgDataUnits;
       prefHighLevel = data.settings.bgHighLevel;
       prefLowLevel = data.settings.bgLowLevel;
@@ -326,16 +326,16 @@ function processOneBg(data) {
   
 // Event occurs when new file(s) are received
 function processBgs(data) {
-  
+      
       points = data.bgdata.sgv;
       trend = data.bgdata.currentTrend;
       lastPollTime = data.bgdata.lastPollTime;
       latestDelta = data.bgdata.delta; 
       BGErrorGray1 = data.bgdata.BGerror;
-      incomingHolder = data;
-      console.log("points:" + JSON.stringify(points));
-      console.log("trend: " + trend);
-      console.log("latest delta: " + latestDelta);
+      
+     // console.log("points:" + JSON.stringify(points));
+     // console.log("trend: " + trend);
+     // console.log("latest delta: " + latestDelta);
       
       let iob = parseFloat(data.bgdata.iob);
       let cob = parseFloat(data.bgdata.cob);
@@ -467,20 +467,20 @@ function processBgs(data) {
       snoozeIcon.style.display = "none";
       muteIconOn = false;
       veryLowSnooze = false;
-      console.log("Reset snooze/mute")
+     // console.log("Reset snooze/mute")
     } else if ((reminderTimer > Math.round(Date.now()/1000)) && muteIconOn === true) {    
         muteIcon.style.display = "inline";
         snoozeIcon.style.display = "none";
-        console.log("muteIcon")
+     //   console.log("muteIcon")
     } else if (reminderTimer > Math.round(Date.now()/1000)) {
           muteIcon.style.display = "none";
           snoozeIcon.style.display = "inline";
-           console.log("snoozeIcon")
+       //    console.log("snoozeIcon")
     } else {
          muteIcon.style.display = "none";
          snoozeIcon.style.display = "none";
          muteIconOn = false;
-         console.log("noIcon")
+       //  console.log("noIcon")
      }
     
     
@@ -516,11 +516,13 @@ function processBgs(data) {
           } else {
             requestData("Settings");
           }
+         
 };
 
 function processBgsPop(data) {
+
   console.log("processBGPop")    
-  let pointsPop = data.bgdata.sgv;
+  let pointsPop = data;
   let headingNumPop;
           //myGraphPop.setYRange(36, 250);
   currentBGPop = pointsPop[0];
@@ -542,8 +544,9 @@ function processBgsPop(data) {
     requestData("Settings");
     }
       let tempMidSend = Math.floor((parseInt(prefHighLevel) + parseInt(prefLowLevel)) / 2);
-          myGraphPop.update(pointsPop, headingNumPop, tempMidSend);
-          
+             
+  myGraphPop.update(pointsPop, headingNumPop, tempMidSend);
+    
    if(prefBgUnits === 'mmol') {  
           let tempprefHighLevel =  (Math.round(mmol(prefHighLevel)*10))/10;
           let tempprefLowLevel = (Math.round(mmol(prefLowLevel)*10))/10;  
@@ -567,181 +570,7 @@ function processBgsPop(data) {
   
           animateArc.animate("disable");
   
-  //Non graph BG functions
-  /*
-      trend = data.bgdata.currentTrend;
-      lastPollTime = data.bgdata.lastPollTime;
-      lastPopTime = lastPollTime;
-      latestDelta = data.bgdata.delta; 
-      BGErrorGray1 = data.bgdata.BGerror;
-      
-      if (isNaN(latestDelta)) { latestDelta = ((pointsPop[0]) - (pointsPop[1])) };
-
-      let iob = parseFloat(data.bgdata.iob);
-      let cob = parseFloat(data.bgdata.cob);
-      let iobtemp;
-      let cobtemp;
-      if ((iob > 0) || (cob > 0)){
-          iobcob.style.display = "inline";
-          if(isNaN(iob)) {
-            iobtemp = "--";
-          } else {
-            iobtemp = iob.toFixed(1);
-          }
-           if(isNaN(cob)) {
-            cobtemp = "-";
-          } else {
-            cobtemp = cob.toFixed(0);
-          }
-          iobcob.text = " - " + iobtemp + "i/" + cobtemp + "c";
-          //console.log(iobcob.text)
-          let minutesWidth = minutesSinceQuery.getBBox().width;
-          iobcob.x = (minutesWidth) + (minutesSinceQuery.x) + 10;
-      } else {
-        iobcob.style.display = "none";
-      }
-
-  
-     // console.log("currentBG: " + currentBG);
-       console.log("points:" + JSON.stringify(points));
-      
-  if(isNaN(currentBGPop) || BGErrorGray1 === true) {
-        deltaDisplay.text = 'no data';
-        setArrowDirection("Even");
-        strikeLine.style.display = "inline";
-        leftArc.style.fill = "#708090"; 
-        
-       
-      } 
-  else {
-    if (signalAlert === true) {
-      clearTimeout(signalTimeout);
-      signalTimeout = null;
-      }
-        strikeLine.style.display = "none";
-        colorSet(currentBGPop); 
-        processOneBg(currentBGPop);
-        
-        minutesSinceQuery.text = (Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) + " mins";    
-      
-        if ((Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) > 999){
-            minutesSinceQuery.text = "N/A";
-        } else if ((Math.floor(((Date.now()/1000) - (lastPopTime/1000)) /60)) < 0){
-            minutesSinceQuery.text = "0 mins";       
-        }
-     
-      
-     // console.log(currentBG + typeof currentBG);
-      //   console.log('reminder timer left: ' + (reminderTimer - Math.round(Date.now()/1000)))
-  //
- 
-       veryLowSnooze = false; 
-    
-    console.log((reminderTimer - Math.round(Date.now()/1000)) )
-  //alerts
-        if( (currentBGPop >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
-         
-          display.poke();
-          
-          if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true)) {
-            
-             if((previousMuteBG - currentBGPop) > 35){
-              //  console.log('BG REALLY HIGH') ;
-                    reminderTimer = (Math.round(Date.now()/1000)) - 10;
-                   if(prefBgUnits === 'mmol') {
-                      startAlertProcess("nudge-max", ((Math.round(mmol(currentBGPop)*10))/10));
-                    } else {
-                      startAlertProcess("nudge-max", currentBGPop);
-                    }
-                } 
-             else {
-               // console.log('BG HIGH') ;
-                    if(prefBgUnits === 'mmol') {
-                      startAlertProcess("nudge-max", ((Math.round(mmol(currentBGPop)*10))/10));
-                    } else {
-                      startAlertProcess("nudge-max", currentBGPop);
-                    }
-              } 
-          }   
-        } 
-         
-   
-        if((currentBGPop <= 45) && (((reminderTimer) <= Math.round(Date.now()/1000)) ) ) {
-                
-          display.poke();
-          
-               // console.log('BG VERY LOW') ;
-                  if(prefBgUnits === 'mmol') {
-                    let tempalertstring = "VERY LOW: " + ((Math.round(mmol(currentBGPop)*10))/10);
-                  startAlertProcess("confirmation-max", tempalertstring);
-                   } else {
-                    let tempalertstring = "VERY LOW: " + currentBGPop;
-                    startAlertProcess("confirmation-max", tempalertstring);
-                   } 
-                  veryLowSnooze = true;        
-    
-        } else if((currentBGPop <= prefLowLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
-           
-          display.poke();
-          
-            if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true)) {  
-                //  console.log('BG LOW') ;
-                  if(prefBgUnits === 'mmol') {
-                  startAlertProcess("nudge-max", ((Math.round(mmol(currentBGPop)*10))/10));
-                   } else {
-                  startAlertProcess("nudge-max", currentBGPop);
-                   } 
-           }
-        }
-    
-    
-    if (disableAlert === true){
-    disableIcon.style.display = "inline";
-  } else {
-    disableIcon.style.display = "none";
-  }
-    
-     
-    if( ( (currentBGPop < prefHighLevel ) && (currentBGPop > prefLowLevel ) ) && (snoozeRemove === true) ) {
-      reminderTimer = Math.round(Date.now()/1000);
-      muteIcon.style.display = "none";
-      snoozeIcon.style.display = "none";
-      muteIconOn = false;
-      veryLowSnooze = false;
-      console.log("Reset snooze/mute")
-    } else if ((reminderTimer > Math.round(Date.now()/1000)) && muteIconOn === true) {    
-        muteIcon.style.display = "inline";
-        snoozeIcon.style.display = "none";
-        console.log("muteIcon")
-    } else if (reminderTimer > Math.round(Date.now()/1000)) {
-          muteIcon.style.display = "none";
-          snoozeIcon.style.display = "inline";
-           console.log("snoozeIcon")
-    } else {
-         muteIcon.style.display = "none";
-         snoozeIcon.style.display = "none";
-         muteIconOn = false;
-         console.log("noIcon")
-     }
-    
-    
-    
-  } 
-      // graph text axis
-     // console.log("prefhighlevel: " + prefHighLevel + "preflowlevel: " + prefLowLevel);
-      if(prefBgUnits === 'mmol') {  
-          let tempprefHighLevel =  (Math.round(mmol(prefHighLevel)*10))/10;
-          let tempprefLowLevel = (Math.round(mmol(prefLowLevel)*10))/10;  
-          high.text = tempprefHighLevel;
-          //middle.text = Math.floor((tempprefHighLevel + tempprefLowLevel) *0.5);//Math.floor(ymin + ((ymax-ymin) *0.5));
-          low.text = tempprefLowLevel;
-      } else {
-          high.text = prefHighLevel;
-          //middle.text = Math.floor((prefHighLevel + prefLowLevel) *0.5);//Math.floor(ymin + ((ymax-ymin) *0.5));
-          low.text = prefLowLevel;
-      }
-  */
-  //popHolder = data;
+          //console.log("incoming holder afterPop: " + JSON.stringify(incomingHolder))
 };
 
 function colorSet(currentBGcolor){
@@ -862,7 +691,7 @@ function noSignal() {
   alertHeaderSignal.text = "No Signal";
   myPopupSignal.style.display = "inline";
   vibration.start("nudge-max")
-  console.log('no signal ON')
+  //console.log('no signal ON')
   SignalvibInt = setTimeout(noSignal, 3000);
 }
 
@@ -927,24 +756,12 @@ btnRight.onclick = function(evt) {
 // Messaging
 //
 //----------------------------------------------------------
-/*
-messaging.peerSocket.onopen = function() {
- // console.log("App Socket Open");
-  initialCall();
-} */
 
-/*messaging.peerSocket.onerror = function(err) {
-  console.log("Connection error: " + err.code + " - " + err.message);
-  
-}
-*/
-
-//messaging.peerSocket.onmessage = function(evt) {
   
 asap.onmessage = message => {
   
   console.log("message recieved at app: " + JSON.stringify(message));
-  
+  //console.log("incoming holder at reception: " + JSON.stringify(incomingHolder))
 
   if (message.hasOwnProperty("settings")) {
     updateSettings(message)
@@ -958,14 +775,11 @@ asap.onmessage = message => {
     event_action: "Blood Glucose Query",
     event_label: "Blood Glucose Query"
   })
-    
+    incomingHolder = message.bgdata.sgv;
+    //console.log("incoming holder after definition: " + JSON.stringify(incomingHolder))
     processBgs(message);
   } 
- // if (message.hasOwnProperty("bgdataPop")) {
-    
-  //  processBgsPop(message);
-  //  animateArc.animate("disable");
-//  } 
+
   if (message.hasOwnProperty("weather")) {
     processWeatherData(message);
   }
@@ -975,14 +789,19 @@ asap.onmessage = message => {
 //Buttons
 
 button1.onclick = function() {
-  console.log("bring up graph");
+  
   animateArc.animate("enable");
-    if (  ((Date.now() - lastPollTime) > 60000) || (currentBGPop != currentBG)  ) {
-       requestData("Data");
-       setTimeout(processBgsPop(incomingHolder), 1500);
+    //if (  ((Date.now() - lastPollTime) > 240000) || (currentBGPop != currentBG)  ) {
+    if (  ((Date.now() - lastPollTime) > 240000) ) {  
+      console.log("bring up graph - new data: " + (Date.now() - lastPollTime)); 
+      //console.log("incoming holder new data: " + JSON.stringify(incomingHolder))
+      requestData("Data");
+       setTimeout(function() {processBgsPop(incomingHolder)}, 1300);
+       
     } else {
-   
-      setTimeout(processBgsPop(incomingHolder), 1500);
+      console.log("bring up graph - old data: " + (Date.now() - lastPollTime));
+      //console.log("incoming holder old data: " + JSON.stringify(incomingHolder))
+      setTimeout(function() {processBgsPop(incomingHolder)}, 500);
     }
 graphTimeout = setTimeout(function(){ GraphScreen.style.display = "none" }, 60000);
 
@@ -1038,7 +857,7 @@ clock.ontick = (evt) => {
         }
   
   if ((queryMins >= 5) && (queryMins <= 10)){
-    console.log("refetch on 5 min timeout")
+   // console.log("refetch on 5 min timeout")
     //clearInterval(mainTimer);
     //mainTimer = setInterval(updateBGPollingStatus, 120000);
    // tempMins = queryMins;
