@@ -4,7 +4,20 @@ import { settingsStorage } from "settings";
 import { me } from "companion";
 import { geolocation } from "geolocation";
 import "fitbit-google-analytics/companion"
+import asap from "fitbit-asap/companion"
+asap.cancel()
 
+me.wakeInterval = 8.5 * 1000 * 60;
+if (me.launchReasons.wokenUp) {
+  asap.cancel()
+  if (manualHighLow === true) {
+    settingsPollManual();
+    fetchURLsMan();
+  } else {
+    fetchURLs();
+  }
+  console.log("Query due to wake interval!")
+}
 
 var latitude = 43.76;
 var longtitude = -79.41;
@@ -57,8 +70,11 @@ var ENDPOINT = "https://api.openweathermap.org/data/2.5/weather?";
 
 
 var DTS = {"weather": {
-      "temperature" : 0,
-      "icon" : 0}}
+             "temperature" : 0,
+             "icon" : 0},
+           "bgdata": {},
+           "settings": {} };
+    
 var BGError = false;
 var timeSelect = false;
 
@@ -73,7 +89,7 @@ var bgLowLevel = 0;
 //var bgTargetTop = 0;
 //var bgTargetBottom = 0;
 var bgTrend = "Flat";
-var points = [220,220,220,220,220,220,220,220,220,220,220,220];
+var points = [220,220,220,220,220,220,220,220,220,220,220,220,null,null,null,null,null,null,null,null,null,null,null,null];
 var pointsPop = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null];
 var currentTimestamp = Math.round(new Date().getTime()/1000);
 var lastTimestamp = 0;
@@ -81,7 +97,7 @@ var latestDelta = 0;
 var disableAlert;
 var snoozeLength;
 var weatherUnitF;
-var dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+var dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
 var dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
@@ -152,11 +168,11 @@ dataSource = getSettings('SourceSelect').values[0].name;
 }
 
 if (dataSource === 'xdrip'){
-  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
 } else if (dataSource === 'spike'){
-  dataUrl = "http://127.0.0.1:1979/sgv.json?count=12";
+  dataUrl = "http://127.0.0.1:1979/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:1979/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:1979/status.json";
 } else if (dataSource === 'nightscout') {
@@ -165,19 +181,19 @@ if (dataSource === 'xdrip'){
     NightURL = getSettings('NightSourceURL').name;
     var lastChar = NightURL.substr(-1);
       if (lastChar !== '/') {       
-        dataUrl = NightURL + "/api/v1/entries/sgv.json?count=12";
+        dataUrl = NightURL + "/api/v1/entries/sgv.json?count=41";
         dataUrlPop = NightURL + "/api/v1/entries/sgv.json?count=41";
         settingsUrl = NightURL + "/api/v1/status.json";
         tempURL = NightURL + "/api/v2/properties";
       } else{
-        dataUrl = NightURL + "api/v1/entries/sgv.json?count=12";
+        dataUrl = NightURL + "api/v1/entries/sgv.json?count=41";
         dataUrlPop = NightURL + "api/v1/entries/sgv.json?count=41";
         settingsUrl = NightURL + "api/v1/status.json";
         tempURL = NightURL + "/api/v2/properties";
       }
   } 
 } else {
-  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
 }
@@ -273,54 +289,70 @@ function getLocation (){
 
 setInterval(getLocation, 900000);
 
+
+
 //----------------------------------------------------------
 //
-// Fetch the weather from OpenWeather
+// Fetch Data
 //
 //----------------------------------------------------------
-function queryOW() {
-  //console.log("Companion fetching weather");
-  //console.log("lat and long: " + latitude + ", " + longtitude);
-  //searchtext = "select item.condition from weather.forecast where woeid in (select woeid from geo.places(1) where text='(" + latitude + "," + longtitude + ")')"
- //fetch("https://query.yahooapis.com/v1/public/yql?q=" + searchtext + " and u='c'&format=json")
-  fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY)
-  .then(function (response) {
-      response.json()
-      .then(function(data) {
-        // We just want the current temperature
-        DTS.weather.temperature = data["main"]["temp"];
-        DTS.weather.icon = data["weather"]["0"]["id"];
+
+async function fetchURLs() {
+  try {
+    var [BGDdata, Settingsdata, Weatherdata] = await Promise.all([
+   
+      fetch(dataUrl).then((response) => response.text()).catch(error => console.log(error.message)),
+      fetch(settingsUrl).then((response) => response.text()).catch(error => console.log(error.message)),
+      fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY).then((response) => response.json()).catch(error => console.log(error.message))
+    ]);
+
+
+        DTS.weather.temperature = Weatherdata["main"]["temp"];
+        DTS.weather.icon = Weatherdata["weather"]["0"]["id"];
         
-       //DTS.weather.temperature = data.query.results.channel.item.condition.temp;
-       //DTS.weather.icon = data.query.results.channel.item.condition.code;
+        //console.log("BGdata: " + JSON.stringify(BGDdata));
+        buildGraphData(BGDdata);
         
-        // Send the weather data to the device
-        
-        console.log(JSON.stringify(DTS));
-              if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-                messaging.peerSocket.send(DTS);
-              } else {
-                console.log("companion - no connection");
-                me.wakeInterval = 2000;
-                setTimeout(function(){messaging.peerSocket.send(DTS);}, 2500);
-                me.wakeInterval = undefined;
-              }
-           
-      });
-  })
-  .catch(function (err) {
-    console.log("Error fetching weather: " + err);
-    
-  });
+        buildSettings(Settingsdata);
+
+
+
+  } catch (error) {
+    console.log(error);
+  }
+  asap.send(DTS);
 }
 
+
+async function fetchURLsMan() {
+  try {
+    // Promise.all() lets us coalesce multiple promises into a single super-promise
+    var [BGDdata, Weatherdata] = await Promise.all([
+   
+      fetch(dataUrl).then((response) => response.text()).catch(error => console.log(error.message)),
+      fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY).then((response) => response.json()).catch(error => console.log(error.message))
+    ]);
+
+        DTS.weather.temperature = Weatherdata["main"]["temp"];
+        DTS.weather.icon = Weatherdata["weather"]["0"]["id"];
+
+        console.log("BGdata: " + JSON.stringify(BGDdata));
+        buildGraphData(BGDdata);
+        
+        buildSettings(Settingsdata);
+
+  } catch (error) {
+    console.log(error);
+  }
+  asap.send(DTS);
+}
 
 //----------------------------------------------------------
 //
 // Aquire BG
 //
 //----------------------------------------------------------
-async function fetchBGD () {
+function fetchBGD () {
   
   if (dataSource === 'nightscout') {
     fetch(tempURL,{
@@ -359,131 +391,16 @@ async function fetchBGD () {
   }
   //console.log("fetch BG- dataUrl:" + dataUrl)
   
-//else {
-//fetchBGD (); 
-//}
-  
+
 
 
 return nDelta;
 };
 
-function queryBGD () {
-  fetch(dataUrl,{
-    method: 'GET',
-    mode: 'cors',
-    headers: new Headers({
-      "Content-Type": 'application/json; charset=utf-8'
-    })
-  })
-.then(response => {
-     response.text().then(data => {
-        //console.log('fetched Data from API');
-        //let obj = JSON.parse(data);
-        let returnval = buildGraphData(data);
-        BGError = false;
-      })
-      .catch(responseParsingError => {
-        console.log("Response parsing error in data!");
-        console.log(responseParsingError.name);
-        console.log(responseParsingError.message);
-        console.log(responseParsingError.toString());
-        console.log(responseParsingError.stack);
-        BGError = true;
-      });
-    }).catch(fetchError => {
-      console.log("Fetch Error in data!");
-      console.log(fetchError.name);
-      console.log(fetchError.message);
-      console.log(fetchError.toString());
-      console.log(fetchError.stack);
-      BGError = true;
-})
-}
-
-async function fetchBGDPop () {
-  console.log("companion queryBGDPop")  
-  //console.log("fetch BG- dataUrl:" + dataUrl)
-  if (dataSource === 'nightscout') {
-    fetch(tempURL,{
-      method: 'GET',
-      mode: 'cors',
-      headers: new Headers({
-        "Content-Type": 'application/json; charset=utf-8'
-      })
-    })
-  .then(response => {
-       response.text().then(data => {
-          //console.log('properties ' + JSON.stringify(data));
-          let tobj = JSON.parse(data);
-          nDelta = tobj.delta.mgdl;
-          BGError = false;
-          console.log('properties ' + nDelta);
-          //fetchBGDPop();
-        })
-        .catch(responseParsingError => {
-          console.log("Response parsing error in data!");
-          console.log(responseParsingError.name);
-          console.log(responseParsingError.message);
-          console.log(responseParsingError.toString());
-          console.log(responseParsingError.stack);
-          BGError = true;
-        });
-      }).catch(fetchError => {
-        console.log("Fetch Error in data!");
-        console.log(fetchError.name);
-        console.log(fetchError.message);
-        console.log(fetchError.toString());
-        console.log(fetchError.stack);
-        BGError = true;
-  })
-  
-  }
- // else {
-   // fetchBGDPop();
- // }
-
-
- return nDelta;
-};
-
-function queryBGDPop () {
-  fetch(dataUrlPop,{
-    method: 'GET',
-    mode: 'cors',
-    headers: new Headers({
-      "Content-Type": 'application/json; charset=utf-8'
-    })
-  })
-.then(response => {
-     response.text().then(data => {
-        console.log('fetched Graph Data from API');
-        //let obj = JSON.parse(data);
-        let returnval = buildGraphDataPop(data);
-        BGError = false;
-      })
-      .catch(responseParsingError => {
-        console.log("Response parsing error in data!");
-        console.log(responseParsingError.name);
-        console.log(responseParsingError.message);
-        console.log(responseParsingError.toString());
-        console.log(responseParsingError.stack);
-        BGError = true;
-      });
-    }).catch(fetchError => {
-      console.log("Fetch Error in data!");
-      console.log(fetchError.name);
-      console.log(fetchError.message);
-      console.log(fetchError.toString());
-      console.log(fetchError.stack);
-      BGError = true;
-})
-}
 
 
 
-
-async function buildGraphData(data) {
+function buildGraphData(data) {
   
   let obj = JSON.parse(data);
   let graphpointindex = 0;
@@ -493,14 +410,14 @@ async function buildGraphData(data) {
   let index = 0;
   let validTimeStamp = false;
 //  console.log(JSON.stringify(obj));
-  for (graphpointindex = 0; graphpointindex < 12; graphpointindex++) {
-    if (index < 12) {
-      while (((runningTimestamp - obj[index].date) >= 305000) && (graphpointindex < 12)) {
+  for (graphpointindex = 0; graphpointindex < 41; graphpointindex++) {
+    if (index < 41) {
+      while (((runningTimestamp - obj[index].date) >= 305000) && (graphpointindex < 41)) {
         points[graphpointindex] = undefined;
         runningTimestamp = runningTimestamp - 300000;
         graphpointindex++;
       }
-      if(graphpointindex < 12) {
+      if(graphpointindex < 41) {
         points[graphpointindex] = obj[index].sgv;
        runningTimestamp = obj[index].date;
       }
@@ -514,9 +431,10 @@ async function buildGraphData(data) {
   }
   lastTimestamp = parseInt(lastTimestamp/1000, 10);
   if (dataSource === 'nightscout') {
-    latestDelta = await fetchBGD();
-  } else {
-  latestDelta = obj[0].delta;}
+   latestDelta = fetchBGD();
+ } else {
+  latestDelta = obj[0].delta;
+  }
   
   //let testiob = '12.36U(0.18|0.18) -1.07 13g'//'1.50U\/h 0.36U(0.18|0.18) -1.07 0g'
   let iob;
@@ -554,7 +472,7 @@ async function buildGraphData(data) {
   //var flippedPoints = points.reverse();
         lastTimestamp = obj[0].date;
         bgTrend = obj[0].direction;
-      const messageContent = {"bgdata" : {
+      DTS.bgdata = {
       "sgv": points, 
       "lastPollTime": lastTimestamp, 
       "currentTrend": bgTrend,
@@ -562,158 +480,13 @@ async function buildGraphData(data) {
       "BGerror": BGError,
       "iob": iob,
       "cob": cob
-    }
-  };
-  console.log("message content sent: " + JSON.stringify(messageContent));
-  if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-    messaging.peerSocket.send(messageContent);
-  } else {
-    console.log("companion - no connection");
-    me.wakeInterval = 2000;
-    setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
-    me.wakeInterval = undefined;
-  }
+      };
+  //console.log("message content sent: " + JSON.stringify(messageContent));
+
+
   return true;
 }
 
-async function buildGraphDataPop(data) {
-  console.log("companion buildGraphDataPop") 
-  let obj = JSON.parse(data);
-  let graphpointindex = 0;
-  var runningTimestamp = new Date().getTime();
-  var indexarray = [];
-
-  let index = 0;
-  //let validTimeStamp = false;
-//  console.log(JSON.stringify(obj));
-  for (graphpointindex = 0; graphpointindex < 41; graphpointindex++) {
-    if (index < 41) {
-      while (((runningTimestamp - obj[index].date) >= 305000) && (graphpointindex < 41)) {
-        pointsPop[graphpointindex] = undefined;
-        runningTimestamp = runningTimestamp - 300000;
-        graphpointindex++;
-      }
-      if(graphpointindex < 41) {
-        pointsPop[graphpointindex] = obj[index].sgv;
-       runningTimestamp = obj[index].date;
-      }
-        
-    }
-    index++
-  }
-  if (dataSource === 'nightscout') { 
-    latestDelta = await fetchBGDPop();
-  } else {
-  latestDelta = obj[0].delta;}
-  
-  //let testiob = '12.36U(0.18|0.18) -1.07 13g'//'1.50U\/h 0.36U(0.18|0.18) -1.07 0g'
-  let iob;
-  let cob;
-  if (obj[0].IOB || obj[0].COB){
-  iob = obj[0].IOB;
-  cob = obj[0].COB;
-  
-   } else  if (obj[0].aaps){
-   //https://regex101.com/r/qFDNIG/4   
-   const regex = /\b(\d+\.?\d+)U\(.+\s+(\d+)g/;
-    const str = obj[0].aaps;
-     //const str = `137.90U(0.18|0.18) -1.07 937g`;
-    let m;
-
-    if ((m = regex.exec(str)) !== null) {
-    // The result can be accessed through the `m`-variable.
-    m.forEach((match, groupIndex) => {
-        console.log(`Found match, group ${groupIndex}: ${match}`);
-    });
-    }
-
-
-    if (m){
-     iob = m[1];
-     cob = m[2];
-    } 
-    
-  } else {
-    iob = 0;
-    cob = 0;
-  }
-  
-  
-  //var flippedPoints = points.reverse();
-        lastTimestamp = obj[0].date;
-        bgTrend = obj[0].direction;  
-  
-  
-  const messageContent = {"bgdataPop" : {
-      "sgv": pointsPop, 
-      "lastPollTime": lastTimestamp, 
-      "currentTrend": bgTrend,
-      "delta": latestDelta,
-      "BGerror": BGError,
-      "iob": iob,
-      "cob": cob
-      }
-  };
-  console.log("message content sent: " + JSON.stringify(messageContent));
-  if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-    messaging.peerSocket.send(messageContent);
-  } else {
-    console.log("companion - no connection");
-    me.wakeInterval = 2000;
-    setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
-    me.wakeInterval = undefined;
-  }
-  return true;
-}
-
-//----------------------------------------------------------
-//
-// Aquire settings
-//
-//----------------------------------------------------------
-
-function settingsPoll (){
-  console.log("manualHighLow " + manualHighLow)
-  if (manualHighLow === true) {
-    settingsPollManual();
-  } else {
-    settingsPollAPI();
-  }
-}
-
-function settingsPollAPI () {
-       
-       //console.log('get settings - settingsUrl' + settingsUrl);
-    
-       fetch(settingsUrl, {
-        method: 'GET',
-        mode: 'cors',
-        headers: new Headers({
-          "Content-Type": 'application/json; charset=utf-8',
-        }),
-      })
-        .then(response => {
-   //       console.log('Get Settings From Phone');
-          response.text().then(statusreply => {
-           // console.log("fetched settings from API");
-            let returnval = buildSettings(statusreply);
-          })
-            .catch(responseParsingError => {
-              console.log('Response parsing error in settings!');
-              console.log(responseParsingError.name);
-              console.log(responseParsingError.message);
-              console.log(responseParsingError.toString());
-              console.log(responseParsingError.stack);
-            });
-        }).catch(fetchError => {
-          console.log('Fetch error in settings!');
-          console.log(fetchError.name);
-          console.log(fetchError.message);
-          console.log(fetchError.toString());
-          console.log(fetchError.stack);
-        });
-   return true;
-};
 
 function buildSettings(settings) {
   // Need to setup High line, Low Line, Units.
@@ -728,7 +501,7 @@ function buildSettings(settings) {
   
   settingsStorage.setItem("unitsType", JSON.stringify(bgDataUnits));
   //console.log("bgDataUnits:" + bgDataUnits);
-  const messageContent = {"settings": {
+  DTS.settings = {
       "bgDataUnits" : bgDataUnits,
       "bgHighLevel" : bgHighLevel,
       "bgLowLevel" : bgLowLevel,
@@ -737,17 +510,8 @@ function buildSettings(settings) {
       "weatherUnitF": weatherUnitF,
       "snoozeRemove": snoozeRemove,
       "signalAlert": signalAlert
-    },
-  }; // end of messageContent
-  console.log(JSON.stringify(messageContent));
-  if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-    messaging.peerSocket.send(messageContent);
-  } else {
-    console.log("companion - no connection");
-    me.wakeInterval = 2000;
-    setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
-    me.wakeInterval = undefined;
-  }
+    }; // end of messageContent
+
   return true;
 }
 
@@ -755,7 +519,7 @@ function buildSettings(settings) {
 function settingsPollManual() {
  
   
-  const messageContent = {"settings": {
+  DTS.settings = {
       "bgDataUnits" : bgDataUnits,
       "bgHighLevel" : bgHighLevel,
       "bgLowLevel" : bgLowLevel,
@@ -765,17 +529,9 @@ function settingsPollManual() {
       "snoozeRemove": snoozeRemove,
       "presenceAlert": presenceAlert,
       "signalAlert": signalAlert
-    },
-  }; // end of messageContent
-  console.log(JSON.stringify(messageContent));
-  if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-    messaging.peerSocket.send(messageContent);
-  } else {
-    console.log("companion - no connection");
-    //me.wakeInterval = 2000;
-    setTimeout(function(){messaging.peerSocket.send(messageContent);}, 2500);
-    //me.wakeInterval = undefined;
-  }
+    }; // end of messageContent
+
+
   return true;
   
 }
@@ -816,11 +572,11 @@ dataSource = getSettings('SourceSelect').values[0].name;
 }
 
 if (dataSource === 'xdrip'){
-  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
 } else if (dataSource === 'spike'){
-  dataUrl = "http://127.0.0.1:1979/sgv.json?count=12";
+  dataUrl = "http://127.0.0.1:1979/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:1979/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:1979/status.json";
 } else if (dataSource === 'nightscout') {
@@ -829,17 +585,17 @@ if (dataSource === 'xdrip'){
     var NightURL = getSettings('NightSourceURL').name;
     var lastChar = NightURL.substr(-1);
       if (lastChar !== '/') {       
-        dataUrl = NightURL + "/api/v1/entries/sgv.json?count=12";
+        dataUrl = NightURL + "/api/v1/entries/sgv.json?count=41";
         dataUrlPop = NightURL + "/api/v1/entries/sgv.json?count=41";
         settingsUrl = NightURL + "/api/v1/status.json";
       } else{
-        dataUrl = NightURL + "api/v1/entries/sgv.json?count=12";
+        dataUrl = NightURL + "api/v1/entries/sgv.json?count=41";
         dataUrlPop = NightURL + "api/v1/entries/sgv.json?count=41";
         settingsUrl = NightURL + "api/v1/status.json";
       }
   } 
 } else {
-  dataUrl = "http://127.0.0.1:17580/sgv.json?count=12";
+  dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
 }
@@ -924,9 +680,14 @@ if (dataSource === 'xdrip'){
     timeSelect = false;
   }
   
-  
-
-settingsPoll();
+  asap.cancel()
+  if (manualHighLow === true) {
+    settingsPollManual();
+    fetchURLsMan();
+  } else {
+    fetchURLs();
+  }
+//ParallelFlow();
 //setTimeout(queryBGD(), 500);
 } 
 
@@ -989,36 +750,31 @@ function querySnooze2(){
 // Messaging
 //
 //----------------------------------------------------------
-messaging.peerSocket.onmessage = function(evt) {
-  if (evt.data.hasOwnProperty("RequestType")) {
-  if (evt.data.RequestType === "Settings" ) {
-     settingsPoll();
-  }
-  if (evt.data.RequestType === "Data" ) {
-   queryBGD();
-  }
-  if (evt.data.RequestType === "DataPop" ) {
-   console.log("companion received DataPop") 
-    queryBGDPop();
-  }
-  if (evt.data.RequestType === "Weather" ) {
-   queryOW();
-  }
-  if (evt.data.RequestType === "Snooze" ) {
-  
-    if (dataUrl.includes("17580")){
-      querySnooze1();
-        }
-    if (dataUrl.includes("1979")){
-      querySnooze2();
+asap.onmessage = message => {
+  console.log("recieved message " + JSON.stringify(message));
+ if (message.hasOwnProperty("RequestType")) {
+    if (message.RequestType === "Data" ) {
+      if (manualHighLow === true) {
+        settingsPollManual();
+        fetchURLsMan();
+      } else {
+        fetchURLs();
+      }
     }
-  
+
+    if (message.RequestType === "Snooze" ) {
+    
+      if (dataUrl.includes("17580")){
+        querySnooze1();
+          }
+      if (dataUrl.includes("1979")){
+        querySnooze2();
+      }
+    
+    }
+
   }
-} 
+
 }
 
-// Listen for the onerror event
-messaging.peerSocket.onerror = function(err) {
-  // Handle any errors
-  console.log("Connection error: " + err.code + " - " + err.message);
-}
+

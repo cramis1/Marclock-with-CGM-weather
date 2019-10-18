@@ -114,14 +114,16 @@ export default class GraphPop {
     
     
     var flippedv = v.reverse(); 
-  console.log("Updating Graph:" + JSON.stringify(flippedv) + " into this many graph points:" + this._vals.length);
+    //console.log('flippedv: ' + flippedv)
+    //var flippedv = v;
+  console.log("Updating Graph:" + JSON.stringify(flippedv) + " into this many graph points:" + this._vals.length + " into length:" + flippedv.length);
    //console.log("height: " + this._height + " t_high:" + this._tHigh + " ymax:" + this._ymax + " ymin" + this._ymin) ;
    //console.log(" y1: " + (this._height - (this._height * (Math.round( ( (this._tHigh - this._ymin) / (this._ymax - this._ymin) )*100 )/100))));  
    
    
-   for (var index = 0; index < this._vals.length; index++) {
-   
-    
+   //for (var index = 0; index < this._vals.length; index++) {
+    for (var index = 0; index < 41; index++) {
+    console.log('flippedvPop:' + index + ': ' + flippedv[index])
      
      //console.log("SGV" + index + ": " + flippedv[index]);
      //this._vals[index].cx = this._width - ((v[index].date-this._xmin) / this._xscale);

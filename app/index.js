@@ -14,6 +14,8 @@ import { preferences } from "user-settings";
 import { BodyPresenceSensor } from "body-presence";
 import { display } from "display";
 import analytics from "fitbit-google-analytics/app"
+import asap from "fitbit-asap/app"
+asap.cancel()
 
 analytics.configure({
   tracking_id: "UA-133644530-1"
@@ -38,10 +40,10 @@ const icon = document.getElementById("weatherIMG");
 let iconNumber = 800;
 const hrm = new HeartRateSensor();
 let BGErrorGray1 = false;
-let BGErrorGray2 = false;
-let BGErrorGray3 = false;
-let BGRed = false;
-let BGOrange = false;
+//let BGErrorGray2 = false;
+//let BGErrorGray3 = false;
+//let BGRed = false;
+//let BGOrange = false;
 let vibrationInterval;
 
 //bg variables
@@ -74,7 +76,7 @@ const GraphScreen= document.getElementById("GraphScreen");
 const button1 = document.getElementById("button1");
 const button2 = document.getElementById("button2");
 const animateArc = document.getElementById("arcUse");
-let tempMins = 0;
+//let tempMins = 0;
 
 
 let prefBgUnits;
@@ -84,9 +86,9 @@ let points;
 let trend;
 let latestDelta = 0;
 let lastPollTime = Date.now();
-let lastPopTime = 0;
-let weatherCount = 7;
-let settingsCount = 4;
+//let lastPopTime = 0;
+//let weatherCount = 7;
+//let settingsCount = 4;
 let disableAlert = false;
 let snoozeLength = 15;
 let weatherUnitF = false;
@@ -96,17 +98,18 @@ let previousMuteBG;
 let recordedBG;
 let reminderTimer = 0;
 var snoozeRemove = false;
-var signalAlert = false;
+var signalAlert = true;
 var muteIconOn = false;
 let veryLowSnooze = false;
 let snoozeOn = false;
 let emergencyInterval;
-let popHolder;
+//let popHolder;
 let currentBG;
 let currentBGPop;
 let graphTimeout;
 var presenceAlert=false;
 const signalTimeout;
+var incomingHolder = {};
 
 hrm.onreading = function (){
   lblHR.text = `${hrm.heartRate}`;
@@ -150,25 +153,12 @@ var mainTimer; //= setInterval(updateBGPollingStatus, 120000);
 initialCall();
 
 function updateBGPollingStatus() {
- 
-      if (settingsCount === 6){   
-          requestData("Settings");
-          settingsCount = 0;
-      } else {
-          settingsCount++
-        }
-      
-      if (weatherCount === 7){
-        requestData("Weather");
-        weatherCount = 0;
-      } else {
-        weatherCount++
-      }
+
    
       requestData("Data");
-
+//if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true))
       console.log('signalAlert: ' + signalAlert + '   !signaltimeout: ' + !signalTimeout)
-  if ((signalAlert === true) && (!signalTimeout)  ) {
+  if ((signalAlert === true) && (!signalTimeout) && (!disableAlert) && (!(charger.connected===true)) ) {
     signalTimeout = setTimeout(noSignal, 1800000);
     //signalTimeout = setTimeout(noSignal, 10000);
     console.log('set signal timeout')
@@ -181,33 +171,17 @@ function requestData(DataType) {
   
   //console.log("Asking for a data update from companion.");
   var messageContent = {"RequestType" : DataType };
-  if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {
-      messaging.peerSocket.send(messageContent);
-     // console.log("Sent request to companion.");
-  } else {
-      console.log("companion - no connection");
-      //setTimeout(function(){messaging.peerSocket.send(messageContent);}, 5000);
-  }
+  console.log("Request data:" + JSON.stringify(messageContent));
+  asap.send(messageContent);
+
 }
 
-/*function refrshTimers(){
-    clearInterval(mainTimer);
-    
-    weatherCount = 0;
-    mainTimer = setInterval(updateBGPollingStatus, 150000);
-    requestData("Data");
-    setTimeout(requestData("Weather"), 15000);
-}*/
 
 function initialCall(){
     
   clearInterval(mainTimer);
-    
-    weatherCount = 0;
-    settingsCount = 0;
-    setTimeout(requestData("Settings"), 500);
-    setTimeout(requestData("Data"), 4000);
-    setTimeout(requestData("Weather"), 8000);
+    requestData("Data");
+
   
     mainTimer = setInterval(updateBGPollingStatus, 150000);
 }
@@ -284,7 +258,7 @@ function updateSettings(data) {
       weatherUnitF = data.settings.weatherUnitF;
       snoozeRemove = data.settings.snoozeRemove;
       presenceAlert = data.settings.presenceAlert;
-      signalAlert = data.settings.signalAlert;
+      //signalAlert = data.settings.signalAlert;
 
   
   if (weatherUnitF === true) {
@@ -352,12 +326,16 @@ function processOneBg(data) {
   
 // Event occurs when new file(s) are received
 function processBgs(data) {
+  
       points = data.bgdata.sgv;
       trend = data.bgdata.currentTrend;
       lastPollTime = data.bgdata.lastPollTime;
       latestDelta = data.bgdata.delta; 
       BGErrorGray1 = data.bgdata.BGerror;
-      
+      incomingHolder = data;
+      console.log("points:" + JSON.stringify(points));
+      console.log("trend: " + trend);
+      console.log("latest delta: " + latestDelta);
       
       let iob = parseFloat(data.bgdata.iob);
       let cob = parseFloat(data.bgdata.cob);
@@ -383,9 +361,11 @@ function processBgs(data) {
         iobcob.style.display = "none";
       }
       
-  currentBG = points[0];
+    if (isNaN(latestDelta)) { latestDelta = ((points[0]) - (points[1])) };
+  
+      currentBG = points[0];
      // console.log("currentBG: " + currentBG);
-       console.log("points:" + JSON.stringify(points));
+       
       
   if(isNaN(currentBG) || BGErrorGray1 === true) {
         deltaDisplay.text = 'no data';
@@ -415,13 +395,13 @@ function processBgs(data) {
  
        veryLowSnooze = false; 
     
-    console.log((reminderTimer - Math.round(Date.now()/1000)) )
+//    console.log((reminderTimer - Math.round(Date.now()/1000)) )
   //alerts
         if( (currentBG >= prefHighLevel) && (reminderTimer <= Math.round(Date.now()/1000))) {
          
           display.poke();
           
-          if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {
+          if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true)) {
             
              if((previousMuteBG - currentBG) > 35){
               //  console.log('BG REALLY HIGH') ;
@@ -463,7 +443,7 @@ function processBgs(data) {
            
           display.poke();
           
-            if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {  
+            if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true)) {  
                 //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBG)*10))/10));
@@ -540,7 +520,7 @@ function processBgs(data) {
 
 function processBgsPop(data) {
   console.log("processBGPop")    
-  let pointsPop = data.bgdataPop.sgv;
+  let pointsPop = data.bgdata.sgv;
   let headingNumPop;
           //myGraphPop.setYRange(36, 250);
   currentBGPop = pointsPop[0];
@@ -585,18 +565,20 @@ function processBgsPop(data) {
           display.poke();
          
   
-  
+          animateArc.animate("disable");
   
   //Non graph BG functions
-      trend = data.bgdataPop.currentTrend;
-      lastPollTime = data.bgdataPop.lastPollTime;
+  /*
+      trend = data.bgdata.currentTrend;
+      lastPollTime = data.bgdata.lastPollTime;
       lastPopTime = lastPollTime;
-      latestDelta = data.bgdataPop.delta; 
-      BGErrorGray1 = data.bgdataPop.BGerror;
+      latestDelta = data.bgdata.delta; 
+      BGErrorGray1 = data.bgdata.BGerror;
       
+      if (isNaN(latestDelta)) { latestDelta = ((pointsPop[0]) - (pointsPop[1])) };
 
-      let iob = parseFloat(data.bgdataPop.iob);
-      let cob = parseFloat(data.bgdataPop.cob);
+      let iob = parseFloat(data.bgdata.iob);
+      let cob = parseFloat(data.bgdata.cob);
       let iobtemp;
       let cobtemp;
       if ((iob > 0) || (cob > 0)){
@@ -661,7 +643,7 @@ function processBgsPop(data) {
          
           display.poke();
           
-          if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {
+          if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true)) {
             
              if((previousMuteBG - currentBGPop) > 35){
               //  console.log('BG REALLY HIGH') ;
@@ -702,7 +684,7 @@ function processBgsPop(data) {
            
           display.poke();
           
-            if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(battery.charging===true)) {  
+            if((!disableAlert && snoozeOn===false) && bodyPresent===true && !(charger.connected===true)) {  
                 //  console.log('BG LOW') ;
                   if(prefBgUnits === 'mmol') {
                   startAlertProcess("nudge-max", ((Math.round(mmol(currentBGPop)*10))/10));
@@ -744,7 +726,7 @@ function processBgsPop(data) {
     
     
     
-  }
+  } 
       // graph text axis
      // console.log("prefhighlevel: " + prefHighLevel + "preflowlevel: " + prefLowLevel);
       if(prefBgUnits === 'mmol') {  
@@ -758,8 +740,8 @@ function processBgsPop(data) {
           //middle.text = Math.floor((prefHighLevel + prefLowLevel) *0.5);//Math.floor(ymin + ((ymax-ymin) *0.5));
           low.text = prefLowLevel;
       }
-  
-  popHolder = data;
+  */
+  //popHolder = data;
 };
 
 function colorSet(currentBGcolor){
@@ -945,26 +927,30 @@ btnRight.onclick = function(evt) {
 // Messaging
 //
 //----------------------------------------------------------
-
+/*
 messaging.peerSocket.onopen = function() {
  // console.log("App Socket Open");
   initialCall();
-}
+} */
 
-messaging.peerSocket.onerror = function(err) {
+/*messaging.peerSocket.onerror = function(err) {
   console.log("Connection error: " + err.code + " - " + err.message);
   
 }
+*/
 
+//messaging.peerSocket.onmessage = function(evt) {
+  
+asap.onmessage = message => {
+  
+  console.log("message recieved at app: " + JSON.stringify(message));
+  
 
-messaging.peerSocket.onmessage = function(evt) {
-  console.log(JSON.stringify(evt));
-
-  if (evt.data.hasOwnProperty("settings")) {
-    updateSettings(evt.data)
+  if (message.hasOwnProperty("settings")) {
+    updateSettings(message)
   } 
 
-  if (evt.data.hasOwnProperty("bgdata")) {
+  if (message.hasOwnProperty("bgdata")) {
     
   analytics.send({
     hit_type: "event",
@@ -972,16 +958,16 @@ messaging.peerSocket.onmessage = function(evt) {
     event_action: "Blood Glucose Query",
     event_label: "Blood Glucose Query"
   })
-
-    processBgs(evt.data);
-  } 
-  if (evt.data.hasOwnProperty("bgdataPop")) {
     
-    processBgsPop(evt.data);
-    animateArc.animate("disable");
+    processBgs(message);
   } 
-  if (evt.data.hasOwnProperty("weather")) {
-    processWeatherData(evt.data);
+ // if (message.hasOwnProperty("bgdataPop")) {
+    
+  //  processBgsPop(message);
+  //  animateArc.animate("disable");
+//  } 
+  if (message.hasOwnProperty("weather")) {
+    processWeatherData(message);
   }
 }
 
@@ -992,12 +978,14 @@ button1.onclick = function() {
   console.log("bring up graph");
   animateArc.animate("enable");
     if (  ((Date.now() - lastPollTime) > 60000) || (currentBGPop != currentBG)  ) {
-       requestData("DataPop");
+       requestData("Data");
+       setTimeout(processBgsPop(incomingHolder), 1500);
     } else {
    
-      processBgsPop(popHolder);
+      setTimeout(processBgsPop(incomingHolder), 1500);
     }
 graphTimeout = setTimeout(function(){ GraphScreen.style.display = "none" }, 60000);
+
 }
 
 button2.onclick = function () {
@@ -1049,7 +1037,7 @@ clock.ontick = (evt) => {
             minutesSinceQuery.text = "N/A";
         }
   
-  if ((queryMins >= 5)){
+  if ((queryMins >= 5) && (queryMins <= 10)){
     console.log("refetch on 5 min timeout")
     //clearInterval(mainTimer);
     //mainTimer = setInterval(updateBGPollingStatus, 120000);
