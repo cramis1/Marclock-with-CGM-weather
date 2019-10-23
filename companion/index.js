@@ -98,7 +98,6 @@ var disableAlert;
 var snoozeLength;
 var weatherUnitF;
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
-//var dataUrl = 'https://shareous1.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=acbeaf3e-bee0-4289-81fe-39f106525b0c&minutes=1440&maxCount=41'
 var dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
@@ -952,13 +951,6 @@ asap.onmessage = message => {
 
 }
 
-/*async function addCheck() {
-  if ((dataSource === 'dexcom') && (fetchAdd === null)) {
-  return await getSession();
-} else {return null}
-}*/
-
-
 async function getSession(){
   
 let subDomain = 'share2';
@@ -975,58 +967,8 @@ await fetch(fetchAdd, {
     body: JSON.stringify({accountName : dexcomUsername, applicationId : "d8665ade-9673-4e27-9ff6-92db4ce13d13", password : dexcomPassword})
   }).then((res) => res.json()).then((dexSessionData) => {dataUrl = "https://" + subDomain + ".dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=" + dexSessionData + "&minutes=1440&maxCount=41"; console.log("dexSessionData " + JSON.stringify(dexSessionData))}).catch(error => console.log(error.message));
 
-  //console.log("dexSessionData " + dexSessionData);
-  
-  /*.then(function(response) {
-    console.log("dexresponse: " + JSON.stringify(response.text()))
-    dexSessionResponse = response.json();
-  }).then(function(data) {
-    dexSessionData = data;
-    console.log("dexSessionData:" + dexSessionData)
-  })*/
 
-//dataUrl = "https://" + subDomain + ".dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=" + dexSessionData + "&minutes=1440&maxCount=41";
-//console.log("Dataurl in function: " + dataUrl);
 return true;
 }
 
 
-
-
-/*
-let dexbody =  {
-    "accountName" : '',
-    "applicationId" :"d8665ade-9673-4e27-9ff6-92db4ce13d13",
-    "password" : ''
-  }
-
-fetch(`https://share2.dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountByName`,{
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    method: 'post',
-    body: JSON.stringify(dexbody)
-  }).then(function(response) {
-    console.log(response)
-    dexSessionResponse = response.text();
-  }).then(function(data) {
-    dexSessionData = data;
-  alert(data)
-  })
-
-
-https://gist.github.com/StephenBlackWasAlreadyTaken/adb0525344bedade1e25
-
-https://github.com/nightscout/share2nightscout-bridge/issues/15
-
- let sessionWait = false;
-  if ((dataSource === 'dexcom') && (fetchAdd = null)) 
-        {sessionWait = await getSession();
-        } else {sessionWait = true}
-  console.log("Dataurl: " + dataUrl);
-  if (sessionWait === true){
-
-
-
-*/
