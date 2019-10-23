@@ -258,7 +258,7 @@ function updateSettings(data) {
       weatherUnitF = data.settings.weatherUnitF;
       snoozeRemove = data.settings.snoozeRemove;
       presenceAlert = data.settings.presenceAlert;
-      //signalAlert = data.settings.signalAlert;
+      signalAlert = data.settings.signalAlert;
 
   
   if (weatherUnitF === true) {
@@ -361,7 +361,7 @@ function processBgs(data) {
         iobcob.style.display = "none";
       }
       
-    if (isNaN(latestDelta)) { latestDelta = ((points[0]) - (points[1])) };
+    if (isNaN(latestDelta)) { latestDelta = ((parseInt(points[0])) - (parseInt(points[1]))) };
   
       currentBG = points[0];
      // console.log("currentBG: " + currentBG);
@@ -379,7 +379,7 @@ function processBgs(data) {
         colorSet(currentBG); 
         processOneBg(currentBG);
       
-        if (signalAlert === true) {
+        if (signalTimeout !== null) {
           clearTimeout(signalTimeout);
           signalTimeout = null;
           }

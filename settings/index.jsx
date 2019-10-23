@@ -8,13 +8,15 @@
           settingsKey="SourceSelect"
             label={<Text bold>Click to select Data Source</Text>}
             options={[
-             {name:'xdrip'},
-             {name:'spike'},
-             {name:'nightscout'}
+             {name:'xdrip', value:'xdrip'},
+             {name:'spike', value:'spike'},
+             {name:'nightscout', value:'nightscout'},
+             {name:'dexcom', value:'dexcom'}
              ]}
           /> 
         
       </Section>
+      {((props.settings.SourceSelect) ? ((JSON.parse(props.settings.SourceSelect).values[0].value == 'nightscout') ? 
       <Section>
         <Text align="center"> <Text italic>Only </Text>if using Nightscout:</Text>
 
@@ -26,7 +28,15 @@
         />
       
         
-       </Section>
+       </Section> : null) : null)} 
+
+       {((props.settings.SourceSelect) ? ((JSON.parse(props.settings.SourceSelect).values[0].value == 'dexcom') ?        
+       <Section>
+          <Text bold align="center">Dexcom</Text>                                        
+          <TextInput title="Username" label="Username" settingsKey="dexcomUsername" />
+          <TextInput title="Password" label="Password" settingsKey="dexcomPassword" />
+          <Toggle settingsKey="USAVSInternational" label="International (Not in USA)"/>            
+         </Section> : null) : null)} 
         
         
        <Section title={<Text bold align="center"> BG Settings</Text>}> 
@@ -37,7 +47,8 @@
           defaultValue="false"
         />  
         
-            
+        {((props.settings.viewSettingSelect) ? ((JSON.parse(props.settings.viewSettingSelect) == true) ? 
+         <Section title={<Text bold align="center">Manual BG Settings</Text>}>    
         <TextInput
           label="High threshold"
           settingsKey="highThresholdIn"
@@ -57,27 +68,36 @@
              {name:"mgdl"}
              ]}
           /> 
+      </Section> : null) : null)} 
       </Section>
-      
+
       <Section title={<Text bold align="center">Alert Settings</Text>}>
         
         <Text>
-          Turn off alerts if watch is not being worn:
+          Turn off alerts while charging:
           </Text>
         <Toggle
             settingsKey="presenceAlert"
             label=" "
           />
-{/* 
+ 
         <Text>
           Raise alert if watch does not receive data for 30 minutes:
           </Text>
         <Toggle
             settingsKey="signalAlert"
             label=" "
+            defaultValue="true"
           />
-      */}
-        <Text>
+      
+        
+     
+       
+      </Section>
+      
+      <Section description={<Text bold italic> Default 'Snooze' is 15 minutes - 'Mute' is for 4 hours</Text>} title={<Text bold align="center">Snooze Settings</Text>}>
+         
+       <Text>
           Alert Snooze time - {props.settingsStorage.getItem('blah')} MINUTES
           </Text>
         <Slider
@@ -88,20 +108,15 @@
           defaultValue="15"
           onChange={value => props.settingsStorage.setItem('blah', value)} 
       />
-         <Text> Default is 15 minutes</Text>
-     
-       
-      </Section>
-      
-       <Section title={<Text bold align="center">Snooze Settings</Text>}>
-                     
       <Text>
-          Turn off snooze and mute when BG is back in range:
+          Turn off Snooze and Mute when BG is back in range:
           </Text>
          <Toggle
             settingsKey="snoozeRemove"
             label=" "
           />
+         
+        
          
              
         </Section>
