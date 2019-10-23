@@ -10,14 +10,15 @@ Fitbit Clock Face for Versa and Ionic
 
 # Instructions
 
-- You must have your blood sugars accessible through a URL. (Examples include [xDrip+](https://github.com/jamorham/xDrip-plus), [Nightscout](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku), [Spike](https://spike-app.com/) )
+- You must have your blood sugars accessible through a URL. (Examples include [xDrip+](https://github.com/jamorham/xDrip-plus), [Nightscout](http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku), [Spike](https://spike-app.com/), [Dexcom Share](https://provider.dexcom.com/education-research/cgm-education-use/videos/setting-dexcom-share-and-follow) )
   - If you are using **xDrip** 
     - Navigate to `Settings` -> `Inter-App settings` -> `xDrip Web Service` -> `ON` 
   - If you are using **Spike**  
     - Activate internal server in `Settings` -> `integration` -> `internal HTTP server` -> `ON` click back to confirm the changes.
   - If you are using **NightScout** you can follow these instructions: http://www.nightscout.info/wiki/welcome/set-up-nightscout-using-heroku. 
     - You will then have a URL address that looks like **https://YOURADDRESS.herokuapp.com**
-    
+   - If you are using **Dexcom Share** you can follow these instructions to set up a dexcom share - make sure to set up at least one follower: https://provider.dexcom.com/education-research/cgm-education-use/videos/setting-dexcom-share-and-follow. 
+      - You will then have to insert your login and password. If you are outside the U.S.A., then select "International (Not in USA)"
 
 - Starting on your phone, navigate to the [latest version of Marclock](https://gam.fitbit.com/gallery/clock/9eacf714-5b23-40c8-9621-ded74bd9edf9) and click the **Select** button. Then click **install**. 
 - After the installation has finished open the **Fitbit** app and navigate to **clock faces** then click the **green gear** to access **Marclock's settings**.
@@ -26,10 +27,12 @@ Fitbit Clock Face for Versa and Ionic
     - If you are using **nightscout** - you **must** enter your nightscout address. The address you enter should be something like **https://YOURADDRESS.herokuapp.com** , where 'YOURADDRESS' is replaced with your personal site address. 
     - **DO NOT include anything after '.com'**
     - Make sure that it is spelled correctly; for example, http**s**:// vs. http://
+    - If you are using **Dexcom Share** - you **must** enter your login and password. If you are outside the U.S.A., then select "International (Not in USA)".
    - Select whether you would like to manually set the BG settings or have the watchface use the setting from xdrip/spike/nightscout
    - Select whether you would like to have the watch not provide alerts if you are not wearing the watch.
-   - Select how many minutes you would like to have the watch snooze an alert, when you select snooze for an alert. Note that **Snooze** is for how many minuites you set, while **Mute** is for 4 hours.
+   - Select how many minutes you would like to have the watch snooze an alert, when you select snooze for an alert. Note that **Snooze** is for how many minuites you set, while **Mute** is for **4 hours**.
    - Select whether you would like to have the watchface turn off any current Snooze or Mute timers if your BG goes back in range.
+   - Select whether you would like to have an alert pop-up if there is no signal for 30 mintues. Note that this alert will **only appear after the first 30 minutes**. 
    - Select whether you would like to disable all alerts (except very low)
    - Select your desired weather unit
    - **OPTIONAL** Input your own openweather API key
