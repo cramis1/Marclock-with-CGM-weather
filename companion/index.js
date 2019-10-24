@@ -428,50 +428,7 @@ async function fetchURLsMan() {
 // Aquire BG
 //
 //----------------------------------------------------------
-/*function fetchBGD () {
-  
-  if (dataSource === 'nightscout') {
-    fetch(tempURL,{
-      method: 'GET',
-      mode: 'cors',
-      headers: new Headers({
-        "Content-Type": 'application/json; charset=utf-8'
-      })
-    })
-  .then(response => {
-       response.text().then(data => {
-          //console.log('properties ' + JSON.stringify(data));
-          let tobj = JSON.parse(data);
-          nDelta = tobj.delta.mgdl;
-          BGError = false;
-          console.log('properties ' + nDelta);
-         
-        })
-        .catch(responseParsingError => {
-          console.log("Response parsing error in data!");
-          console.log(responseParsingError.name);
-          console.log(responseParsingError.message);
-          console.log(responseParsingError.toString());
-          console.log(responseParsingError.stack);
-          BGError = true;
-        });
-      }).catch(fetchError => {
-        console.log("Fetch Error in data!");
-        console.log(fetchError.name);
-        console.log(fetchError.message);
-        console.log(fetchError.toString());
-        console.log(fetchError.stack);
-        BGError = true;
-  })
-  
-  }
-  //console.log("fetch BG- dataUrl:" + dataUrl)
-  
 
-
-
-return nDelta;
-}; */
 
 
 
@@ -489,22 +446,9 @@ async function buildGraphData(data) {
   if (dataSource === 'dexcom') {
 
     for (graphpointindex = 0; graphpointindex < 41; graphpointindex++) {
-      //if (index < 41) {
-       /* while (((runningTimestamp - obj[index].date) >= 305000) && (graphpointindex < 41)) {
-          points[graphpointindex] = undefined;
-          runningTimestamp = runningTimestamp - 300000;
-          graphpointindex++;
-        } */
-       // if(graphpointindex < 41) {
+      
           points[graphpointindex] = obj[graphpointindex].Value;
-       // }
-         /* if (!validTimeStamp) {
-          lastTimestamp = obj[index].date;
-          
-          validTimeStamp = true;
-        } */
-     // }
-     // index++
+       
     }
     latestDelta = (points[0] - points[1]);
     let tempTimestamp = obj[0].WT;
@@ -570,11 +514,9 @@ async function buildGraphData(data) {
     index++
   }
   lastTimestamp = parseInt(lastTimestamp/1000, 10);
-  //if (dataSource === 'nightscout') {
-  // latestDelta = await fetchBGD();
- //} else {
+  
   latestDelta = obj[0].delta;
-  //}
+ 
 
 
   let iob;
@@ -609,7 +551,7 @@ async function buildGraphData(data) {
   }
   
   
-  //var flippedPoints = points.reverse();
+  
         lastTimestamp = obj[0].date;
         bgTrend = obj[0].direction;
       DTS.bgdata = {
