@@ -364,7 +364,7 @@ function processBgs(data) {
     if (isNaN(latestDelta)) { latestDelta = ((parseInt(points[0])) - (parseInt(points[1]))) };
   
       currentBG = points[0];
-     // console.log("currentBG: " + currentBG);
+     console.log("currentBG: " + currentBG);
        
       
   if(isNaN(currentBG) || BGErrorGray1 === true) {
@@ -857,15 +857,18 @@ clock.ontick = (evt) => {
         }
   
   if ((queryMins >= 5) && (queryMins <= 10)){
-   // console.log("refetch on 5 min timeout")
-    //clearInterval(mainTimer);
-    //mainTimer = setInterval(updateBGPollingStatus, 120000);
-   // tempMins = queryMins;
+ 
     updateBGPollingStatus()
 
   }
 
- 
+  if ((queryMins >= 30) && (signalAlert === true)  && (!disableAlert) && (!(charger.connected===true))){
+    if (signalTimeout !== null) {
+      clearTimeout(signalTimeout);
+      signalTimeout = null;
+      }
+      noSignal();
+   }
     
   
   if (presenceAlert===true){

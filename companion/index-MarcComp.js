@@ -98,7 +98,6 @@ var disableAlert;
 var snoozeLength;
 var weatherUnitF;
 var dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
-//var dataUrl = 'https://shareous1.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=acbeaf3e-bee0-4289-81fe-39f106525b0c&minutes=1440&maxCount=41'
 var dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
 var settingsUrl = "http://127.0.0.1:17580/status.json";
 var manualHighLow;
@@ -109,12 +108,7 @@ var dataSource;
 var presenceAlert;
 var NightURL = "";
 var dexSessionResponse;
-var dexSessionData = null;
-var fetchAdd = null;
-var USAVSInternational = false;
-var dexcomPassword = null;
-var dexcomUsername = null;
-var fetchMethod = 'GET';
+var dexSessionData;
 
 //----------------end other variables
 if(getSettings( 'openKey' )) {
@@ -126,7 +120,7 @@ if(getSettings( 'openKey' )) {
     signalAlert = getSettings('signalAlert');
     console.log("signalalert: " + signalAlert)
   } else {
-    signalAlert = true;
+    signalAlert = false;
   }
 
 if(getSettings( 'snoozeRemove' )) {
@@ -176,17 +170,15 @@ dataSource = getSettings('SourceSelect').values[0].name;
 }
 
 if (dataSource === 'xdrip'){
-  fetchMethod = 'get';
   dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
 } else if (dataSource === 'spike'){
-  fetchMethod = 'get';
   dataUrl = "http://127.0.0.1:1979/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:1979/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:1979/status.json";
 } else if (dataSource === 'nightscout') {
-  fetchMethod = 'get';
+ 
   if(getSettings('NightSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
     NightURL = getSettings('NightSourceURL').name;
     var lastChar = NightURL.substr(-1);
@@ -205,7 +197,7 @@ if (dataSource === 'xdrip'){
 
 } else if (dataSource === 'dexcom') {
 
-  fetchMethod = 'post';
+  let dexcomUsername = null;
   if (settingsStorage.getItem('dexcomUsername')) {
     console.log(settingsStorage.getItem('dexcomUsername'))
     dexcomUsername = JSON.parse(settingsStorage.getItem('dexcomUsername')).name;
@@ -214,7 +206,7 @@ if (dataSource === 'xdrip'){
     settingsStorage.setItem("dexcomUsername", JSON.stringify({"name":dexcomUsername}));
   }
  
-  
+  let dexcomPassword = null;
   if (settingsStorage.getItem('dexcomPassword')) {
     console.log(settingsStorage.getItem('dexcomPassword'))
     dexcomPassword = JSON.parse(settingsStorage.getItem('dexcomPassword')).name;
@@ -223,18 +215,46 @@ if (dataSource === 'xdrip'){
     settingsStorage.setItem("dexcomPassword", JSON.stringify({"name":dexcomPassword}));
   }
 
-  
+  let USAVSInternational = null;
   if (settingsStorage.getItem('USAVSInternational')) {
     USAVSInternational = JSON.parse(settingsStorage.getItem('USAVSInternational'));
   } else if (!USAVSInternational) {
     USAVSInternational = false;
   } 
- 
+
+  let dexbody =  {
+    accountName : dexcomUsername,
+    applicationId :"d8665ade-9673-4e27-9ff6-92db4ce13d13",
+    password : dexcomPassword
+  }
+
+  let subDomain = 'share2';
+  if(USAVSInternational) {
+      subDomain = 'shareous1';
+  }
+  
+  
+  fetch(`https://${subDomain}.dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountByName`,{
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'post',
+    body: JSON.stringify(dexbody)
+  }).then(function(response) {
+    //console.log(response)
+    dexSessionResponse = response.text();
+  }).then(function(data) {
+    dexSessionData = data;
+    console.log("dexSessionData:" + dexSessionData)
+  })
+  
+  //dataUrl = `https://${subDomain}.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${dexSessionData}&minutes=1440&maxCount=41`;
+  dataUrl = "https://${subDomain}.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=b4e64424-8e01-452d-841a-39f0fb45b0c4&minutes=1440&maxCount=41" ;
 } else {
   dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
-  fetchMethod = 'get';
 }
 
 if(getSettings( 'viewSettingSelect' )) {
@@ -332,95 +352,67 @@ setInterval(getLocation, 900000);
 //----------------------------------------------------------
 
 async function fetchURLs() {
-  let sessionWait = false;
-  console.log("data source=" + dataSource + " dexSessionData=" + dexSessionData)
-  if ((dataSource === 'dexcom')) //&& (dexSessionData === null)) 
-        {sessionWait = await getSession();
-          fetchMethod = 'post'
-        } else {
-          sessionWait = true
-          fetchMethod = 'get'
-        }
-  console.log("Dataurl: " + dataUrl);
-  if (sessionWait === true){
   try {
     var [BGDdata, Settingsdata, Weatherdata] = await Promise.all([
    
       fetch(dataUrl, {
-        //headers: {
-         // 'Accept': 'application/json',
-         // 'Content-Type': 'application/json'
-       // },
-        method: fetchMethod,
-      }).then((response) => response.text()).catch(error => console.log("data fetch error:" + error.message)),
-      fetch(settingsUrl).then((response) => response.text()).catch(error => console.log("settings fetch error:" + error.message)),
-      fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY).then((response) => response.json()).catch(error => console.log("weather fetch error:" + error.message))
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: 'post',
+      }).then((response) => response.text()).catch(error => console.log(error.message)),
+      fetch(settingsUrl).then((response) => response.text()).catch(error => console.log(error.message)),
+      fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY).then((response) => response.json()).catch(error => console.log(error.message))
     ]);
 
-        console.log("Data: " + JSON.stringify(BGDdata));
-        
+
         DTS.weather.temperature = Weatherdata["main"]["temp"];
         DTS.weather.icon = Weatherdata["weather"]["0"]["id"];
         
         //console.log("BGdata: " + JSON.stringify(BGDdata));
-        let temp1 = buildGraphData(BGDdata);
+        buildGraphData(BGDdata);
         
-        let temp2 = buildSettings(Settingsdata);
+        buildSettings(Settingsdata);
 
-        let flagDTS = await temp1 + await temp2;
 
-        console.log("DTS: " + JSON.stringify(DTS));
-        asap.send(DTS);
 
   } catch (error) {
     console.log(error);
   }
-  
-};
+  console.log("Data: " + JSON.stringify(DTS));
+  asap.send(DTS);
 }
 
 
 async function fetchURLsMan() {
-  let sessionWait = false;
-  console.log("data source=" + dataSource + " dexSessionData=" + dexSessionData)
-  if ((dataSource === 'dexcom')) //&& (dexSessionData === null)) 
-        {sessionWait = await getSession();
-          fetchMethod = 'post'
-    } else {
-          sessionWait = true
-          fetchMethod = 'get'
-    }
-  console.log("Dataurl: " + dataUrl);
-  if (sessionWait === true){
   try {
     
     var [BGDdata, Weatherdata] = await Promise.all([
    
       fetch(dataUrl, {
-       // headers: {
-        //  'Accept': 'application/json',
-        //  'Content-Type': 'application/json'
-      //  },
-        method: fetchMethod,
-      }).then((response) => response.text()).catch(error => console.log("data fetch error:" + error.message)),
-      fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY).then((response) => response.json()).catch(error => console.log("weather fetch error:" + error.message))
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: 'post',
+      }).then((response) => response.text()).catch(error => console.log(error.message)),
+      fetch(ENDPOINT + "lat=" + latitude + "&lon=" + longtitude + "&units=metric&APPID=" + API_KEY).then((response) => response.json()).catch(error => console.log(error.message))
     ]);
 
         DTS.weather.temperature = Weatherdata["main"]["temp"];
         DTS.weather.icon = Weatherdata["weather"]["0"]["id"];
 
-       //console.log("BGdata: " + JSON.stringify(BGDdata));
-        let temp1 = await buildGraphData(BGDdata);
+       // console.log("BGdata: " + JSON.stringify(BGDdata));
+        buildGraphData(BGDdata);
         
         //buildSettings(Settingsdata);
-        console.log("DTS " + JSON.stringify(DTS));
-        asap.send(DTS);
+
   } catch (error) {
     console.log(error);
   }
-  
-  
-};
+  console.log("Data: " + JSON.stringify(DTS));
+  asap.send(DTS);
 }
 
 //----------------------------------------------------------
@@ -428,7 +420,7 @@ async function fetchURLsMan() {
 // Aquire BG
 //
 //----------------------------------------------------------
-/*function fetchBGD () {
+function fetchBGD () {
   
   if (dataSource === 'nightscout') {
     fetch(tempURL,{
@@ -471,13 +463,13 @@ async function fetchURLsMan() {
 
 
 return nDelta;
-}; */
+};
 
 
 
 
-async function buildGraphData(data) {
-  //console.log("data received for building graph: " + data)
+function buildGraphData(data) {
+  
   let obj = JSON.parse(data);
   let graphpointindex = 0;
   var runningTimestamp = new Date().getTime();
@@ -506,7 +498,7 @@ async function buildGraphData(data) {
      // }
      // index++
     }
-    latestDelta = (points[0] - points[1]);
+    latestDelta = ((parseInt(points[0])) - (parseInt(points[1])));
     let tempTimestamp = obj[0].WT;
     lastTimestamp = tempTimestamp.replace(/.*\(|\).*/g, '');
     let tempTrend = obj[0].Trend;
@@ -546,7 +538,7 @@ async function buildGraphData(data) {
   "BGerror": BGError
   };
  
-//console.log("DTS.bgdata: " + JSON.stringify(DTS.bgdata))
+console.log("DTS.bgdata: " + JSON.stringify(DTS.bgdata))
 
   } else {
 
@@ -570,11 +562,11 @@ async function buildGraphData(data) {
     index++
   }
   lastTimestamp = parseInt(lastTimestamp/1000, 10);
-  //if (dataSource === 'nightscout') {
-  // latestDelta = await fetchBGD();
- //} else {
+  if (dataSource === 'nightscout') {
+   latestDelta = fetchBGD();
+ } else {
   latestDelta = obj[0].delta;
-  //}
+  }
 
 
   let iob;
@@ -688,7 +680,7 @@ settingsStorage.onchange = function(evt) {
     signalAlert = getSettings('signalAlert');
     console.log("signalalert: " + signalAlert)
   } else {
-    signalAlert = true;
+    signalAlert = false;
   }
 
   
@@ -712,17 +704,15 @@ dataSource = getSettings('SourceSelect').values[0].name;
 }
 
 if (dataSource === 'xdrip'){
-  fetchMethod = 'get';
   dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
 } else if (dataSource === 'spike'){
-  fetchMethod = 'get';
   dataUrl = "http://127.0.0.1:1979/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:1979/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:1979/status.json";
 } else if (dataSource === 'nightscout') {
-  fetchMethod = 'get';
+ 
   if(getSettings('NightSourceURL')){ //&& (getSettings('dataSourceURL').name.includes('http'))) {
     var NightURL = getSettings('NightSourceURL').name;
     var lastChar = NightURL.substr(-1);
@@ -739,40 +729,64 @@ if (dataSource === 'xdrip'){
 
 } else if (dataSource === 'dexcom') {
 
-
+  let dexcomUsername = null;
   if (settingsStorage.getItem('dexcomUsername')) {
-    console.log(settingsStorage.getItem('dexcomUsername'))
+    //console.log(settingsStorage.getItem('dexcomUsername'))
     dexcomUsername = JSON.parse(settingsStorage.getItem('dexcomUsername')).name;
   } else if (!dexcomUsername) {
     dexcomUsername = null;
     settingsStorage.setItem("dexcomUsername", JSON.stringify({"name":dexcomUsername}));
   }
  
- 
+  let dexcomPassword = null;
   if (settingsStorage.getItem('dexcomPassword')) {
-    console.log(settingsStorage.getItem('dexcomPassword'))
+    //console.log(settingsStorage.getItem('dexcomPassword'))
     dexcomPassword = JSON.parse(settingsStorage.getItem('dexcomPassword')).name;
   } else if (!dexcomPassword) {
     dexcomPassword = null;
     settingsStorage.setItem("dexcomPassword", JSON.stringify({"name":dexcomPassword}));
   }
 
-  
+  let USAVSInternational = null;
   if (settingsStorage.getItem('USAVSInternational')) {
     USAVSInternational = JSON.parse(settingsStorage.getItem('USAVSInternational'));
   } else if (!USAVSInternational) {
     USAVSInternational = false;
   } 
 
-  fetchMethod = 'post';
+  let dexbody =  {
+    accountName : dexcomUsername,
+    applicationId :"d8665ade-9673-4e27-9ff6-92db4ce13d13",
+    password : dexcomPassword
+  }
 
+  let subDomain = 'share2';
+  if(USAVSInternational) {
+      subDomain = 'shareous1';
+  }
   
+  
+  fetch(`https://${subDomain}.dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountByName`,{
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    method: 'post',
+    body: JSON.stringify(dexbody)
+  }).then(function(response) {
+    //console.log(response)
+    dexSessionResponse = response.text();
+  }).then(function(data) {
+    dexSessionData = data;
+    console.log("dexSessionData:" + dexSessionData)
+  })
+
+  dataUrl = `https://${subDomain}.dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=${dexSessionData}&minutes=1440&maxCount=41`;
 
 } else {
   dataUrl = "http://127.0.0.1:17580/sgv.json?count=41";
   dataUrlPop = "http://127.0.0.1:17580/sgv.json?count=41";
   settingsUrl = "http://127.0.0.1:17580/status.json";
-  fetchMethod = 'get';
 }
   
   
@@ -953,27 +967,33 @@ asap.onmessage = message => {
 }
 
 
+/*
+let dexbody =  {
+    "accountName" : '',
+    "applicationId" :"d8665ade-9673-4e27-9ff6-92db4ce13d13",
+    "password" : ''
+  }
 
-async function getSession(){
-  
-let subDomain = 'share2';
-if(USAVSInternational) {
-    subDomain = 'shareous1';
-}
-fetchAdd = "https://" + subDomain + ".dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountByName"
-await fetch(fetchAdd, {
-    method: 'POST',  
+fetch(`https://share2.dexcom.com/ShareWebServices/Services/General/LoginPublisherAccountByName`,{
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({accountName : dexcomUsername, applicationId : "d8665ade-9673-4e27-9ff6-92db4ce13d13", password : dexcomPassword})
-  }).then((res) => res.json()).then((dexSessionData) => {dataUrl = "https://" + subDomain + ".dexcom.com/ShareWebServices/Services/Publisher/ReadPublisherLatestGlucoseValues?sessionId=" + dexSessionData + "&minutes=1440&maxCount=41"; console.log("dexSessionData " + JSON.stringify(dexSessionData))}).catch(error => console.log(error.message));
+    method: 'post',
+    body: JSON.stringify(dexbody)
+  }).then(function(response) {
+    console.log(response)
+    dexSessionResponse = response.text();
+  }).then(function(data) {
+    dexSessionData = data;
+  alert(data)
+  })
 
 
-return true;
-}
+https://gist.github.com/StephenBlackWasAlreadyTaken/adb0525344bedade1e25
 
+https://github.com/nightscout/share2nightscout-bridge/issues/15
 
+b4e64424-8e01-452d-841a-39f0fb45b0c4
 
-
+*/
