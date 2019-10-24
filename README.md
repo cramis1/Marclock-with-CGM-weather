@@ -30,7 +30,7 @@ Fitbit Clock Face for Versa and Ionic
     - If you are using **Dexcom Share** - you **must** enter your login and password. If you are outside the U.S.A., then select "International (Not in USA)".
    - Select whether you would like to manually set the BG settings or have the watchface use the setting from xdrip/spike/nightscout
    - Select whether you would like to have the watch not provide alerts if you are not wearing the watch.
-   - Select how many minutes you would like to have the watch snooze an alert, when you select snooze for an alert. Note that **Snooze** is for how many minuites you set, while **Mute** is for **4 hours**.
+   - Select how many minutes you would like to have the watch snooze an alert, when you select snooze for an alert. Note that **Snooze** is for how many minutes you set, while **Mute** is for **4 hours**.
    - Select whether you would like to have the watchface turn off any current Snooze or Mute timers if your BG goes back in range.
    - Select whether you would like to have an alert pop-up if there is no signal for 30 mintues. Note that this alert will **only appear after the first 30 minutes**. 
    - Select whether you would like to disable all alerts (except very low)
@@ -42,11 +42,7 @@ Fitbit Clock Face for Versa and Ionic
       - Paste the API key into the Marcklock settings in the space provided to input your own API key
 - If you would like to change to a 24 hour clock or to a 12 hour clock, go to change the 'Clock Display Time' preference on your fitbit profile: https://www.fitbit.com/settings/profile. 
 
-# Features
-This clock face supports Blood Glucose (CGM - continuous glucose monitoring) data from XDrip+, Spike, or Nightscout. 
-
-Includes: 
-
+# Aspects
 - Weather
 - Heart-rate
 - Steps
@@ -65,18 +61,16 @@ Includes:
 -When there is a missed BG reading, Current BG will have a gray strike-through, arc will turn gray, and graph point will turn gray and be placed in the middle of the graph. 
 -A current BG of question marks means a connection with your phone (companion) has not been established, try tapping on the screen to refetch the data from Xdrip.
 
-You can also bring up a large graph AT ANY TIME by clicking on the screen (may take a second or two to come up due to fetching more BG data points).
+-You can also bring up a large graph AT ANY TIME by clicking on the screen (may take a second or two to come up due to fetching more BG data points).
 
-BG readings are fetched around every 2 minutes. 
+-BG readings are fetched around every 2 minutes. 
 
-Units/thresholds are taken from source (e.g., from xdrip) or as inputted manually in the settings.
+-Units/thresholds are taken from source (e.g., from xdrip) or as inputted manually in the settings.
 
-'Disable alert' should disable all alerts except very low.
+-'Disable alert' should disable all alerts except very low.
 
-There is now an option to only alert if the watch is detected as being worn. This will prevent the watch from losing all its batteries for an alert when it is not being worn and a person is not there to snooze the alarm.
-
-On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
-Snooze and mute should ALSO snooze alert on xdrip/spike.
+-On alerts, 'Mute' is for 4 HOURS, 'Snooze' is for as many minutes as set in the settings (default 15 minutes). 
+  -Snooze and mute should ALSO snooze alert on xdrip/spike.
 
 -An |S| indicates a snooze is ongoing; a |M| indicates a mute is ongoing; a |D| indicates that alerts have been disabled.
 
